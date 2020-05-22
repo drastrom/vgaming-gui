@@ -439,6 +439,7 @@ def __init_resources():
       </object>
       <object class="sizeritem">
         <object class="wxGauge" name="gauge">
+          <size>300,-1</size>
           <style>wxGA_HORIZONTAL|wxGA_SMOOTH</style>
           <XRCED>
             <assign_var>1</assign_var>
@@ -446,7 +447,6 @@ def __init_resources():
         </object>
         <flag>wxALL|wxEXPAND</flag>
         <border>7</border>
-        <minsize>300,30</minsize>
       </object>
     </object>
     <title>Please wait...</title>
