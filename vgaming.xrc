@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<resource class="spacer">
+  <object class="wxFrame" name="mainframe">
+    <object class="wxMenuBar" name="menuBar">
+      <object class="wxMenu" name="mnuFile">
+        <object class="wxMenuItem" name="wxID_EXIT">
+          <label>E&amp;xit</label>
+          <bitmap stock_id="wxART_QUIT"/>
+          <XRCED>
+            <events>EVT_MENU</events>
+          </XRCED>
+        </object>
+        <label>&amp;File</label>
+      </object>
+      <object class="wxMenu" name="mnuEdit">
+        <label>&amp;Edit</label>
+        <object class="wxMenuItem" name="itmSettings">
+          <label>&amp;Settings...</label>
+          <bitmap stock_id="wxART_HELP_SETTINGS"/>
+          <XRCED>
+            <events>EVT_MENU</events>
+          </XRCED>
+        </object>
+      </object>
+    </object>
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Status</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlStatus">
+              <enabled>0</enabled>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Instance ID</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlInstanceId">
+              <enabled>0</enabled>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Spot Request ID</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlSpotId">
+              <enabled>0</enabled>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Public IP</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlPublicIP">
+              <enabled>0</enabled>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <cols>2</cols>
+          <vgap>4</vgap>
+          <hgap>2</hgap>
+          <growablecols>1</growablecols>
+        </object>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="btnStart">
+              <label>Start</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+            <border>4</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="btnStop">
+              <label>Stop</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+            <flag>wxLEFT</flag>
+            <border>4</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="btnRDP">
+              <label>RDP</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+            <flag>wxLEFT</flag>
+            <border>4</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="btnDCV">
+              <label>DCV</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+            <flag>wxLEFT</flag>
+            <border>4</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTRE|wxALIGN_BOTTOM</flag>
+        <border>7</border>
+      </object>
+    </object>
+    <title>vGaming</title>
+    <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
+  </object>
+  <object class="wxDialog" name="dlgSettings">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Region</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlRegion">
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Access key ID</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlAccessKey">
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Secret access key</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlSecret">
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Launch template ID</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlLaunchTemplate">
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
+          <cols>2</cols>
+          <vgap>4</vgap>
+          <hgap>2</hgap>
+          <growablecols>1</growablecols>
+          <growablerows/>
+        </object>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <label>&amp;OK</label>
+              <default>1</default>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL">
+              <label>&amp;Cancel</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_APPLY">
+              <label>&amp;Apply</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+          </object>
+        </object>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTRE|wxALIGN_BOTTOM</flag>
+        <border>7</border>
+      </object>
+    </object>
+    <title>Settings</title>
+    <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
+    <XRCED>
+      <events>EVT_INIT_DIALOG</events>
+    </XRCED>
+  </object>
+  <object class="wxDialog" name="dlgWait">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Please wait...</label>
+        </object>
+        <flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGauge" name="gauge">
+          <style>wxGA_HORIZONTAL|wxGA_SMOOTH</style>
+          <XRCED>
+            <assign_var>1</assign_var>
+          </XRCED>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>7</border>
+        <minsize>300,30</minsize>
+      </object>
+    </object>
+    <title>Please wait...</title>
+    <centered>1</centered>
+    <style>wxCLIP_CHILDREN|wxCAPTION|wxSYSTEM_MENU</style>
+    <XRCED>
+      <events>EVT_INIT_DIALOG|EVT_CLOSE</events>
+    </XRCED>
+  </object>
+</resource>
