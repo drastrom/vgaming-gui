@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#import boto3, botocore
+import boto3, botocore
 import json
 import threading
 import time
@@ -13,6 +13,10 @@ except (ImportError, NameError):
         """ This is all typing.final really is... It's all about declaring to a
         type checker, not actually doing anything at runtime. """
         return f
+
+# Utility function
+def make_boto3_session(settings):
+        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'key' in key})
 
 class WaitDlg(vgaming_xrc.xrcdlgWait):
     def __init__(self, parent):
@@ -58,6 +62,25 @@ class WaitDlgThread(threading.Thread):
         """ @see threading.Thread.run """
         super(WaitDlgThread, self).run()
 
+class DescribeInstancesThread(WaitDlgThread):
+    def __init__(self, parent):
+        super(DescribeInstancesThread, self).__init__(parent)
+        # make a consistent copy
+        self.settings = dict(wx.GetApp().settings)
+
+    def process(self):
+        #session = boto3.session.Session(aws_access_key_id=self.settings["access_key_id"], aws_secret_access_key=self.settings["secret_access_key"], region_name=self.settings["region"])
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        ret = ec2.describe_instances(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
+        print (ret)
+        #TODO do they tag the spot request or just the instances?
+        ret = ec2.describe_spot_instance_requests(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
+        print (ret)
+        ret = ec2.describe_launch_templates(LaunchTemplateIds=[self.settings["launch_template_id"]])
+        print (ret)
+        print (ret["LaunchTemplates"][0]["LaunchTemplateName"])
+
 class SettingsDlg(vgaming_xrc.xrcdlgSettings):
     def __init__(self, parent):
         super(SettingsDlg, self).__init__(parent)
@@ -97,7 +120,7 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         super(MainFrame, self).__init__(parent)
 
     def OnButton_btnStart(self, evt):
-        thread = WaitDlgThread(self, target=lambda: time.sleep(5.0))
+        thread = DescribeInstancesThread(self)
         thread.start()
 
     def OnButton_btnStop(self, evt):
