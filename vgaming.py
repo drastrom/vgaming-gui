@@ -51,7 +51,7 @@ class WaitDlg(vgaming_xrc.xrcdlgWait):
     def OnTimer(self, evt):
         self.gauge.Pulse()
 
-    def OnDestroy(self, evt):
+    def OnWindow_destroy(self, evt):
         self.timer.Stop()
 
 class WaitDlgThread(threading.Thread):

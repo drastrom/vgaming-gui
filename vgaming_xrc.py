@@ -160,6 +160,7 @@ class xrcdlgWait(wx.Dialog):
 
         self.Bind(wx.EVT_INIT_DIALOG, self.OnInit_dialog)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.OnWindow_destroy)
 
 #!XRCED:begin-block:xrcdlgWait.OnInit_dialog
     def OnInit_dialog(self, evt):
@@ -172,6 +173,12 @@ class xrcdlgWait(wx.Dialog):
         # Replace with event handler code
         print "OnClose()"
 #!XRCED:end-block:xrcdlgWait.OnClose        
+
+#!XRCED:begin-block:xrcdlgWait.OnWindow_destroy
+    def OnWindow_destroy(self, evt):
+        # Replace with event handler code
+        print "OnWindow_destroy()"
+#!XRCED:end-block:xrcdlgWait.OnWindow_destroy        
 
 
 
@@ -453,7 +460,7 @@ def __init_resources():
     <centered>1</centered>
     <style>wxCLIP_CHILDREN|wxCAPTION|wxSYSTEM_MENU</style>
     <XRCED>
-      <events>EVT_INIT_DIALOG|EVT_CLOSE</events>
+      <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
     </XRCED>
   </object>
 </resource>'''

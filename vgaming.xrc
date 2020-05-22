@@ -267,7 +267,7 @@
     <centered>1</centered>
     <style>wxCLIP_CHILDREN|wxCAPTION|wxSYSTEM_MENU</style>
     <XRCED>
-      <events>EVT_INIT_DIALOG|EVT_CLOSE</events>
+      <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
     </XRCED>
   </object>
 </resource>
