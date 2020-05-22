@@ -4,7 +4,9 @@ import boto3, botocore
 import json
 import threading
 import time
+from traceback import format_exc
 import vgaming_xrc, wx
+import wx.lib.agw.genericmessagedialog
 
 try:
     from typing import final
@@ -14,9 +16,24 @@ except (ImportError, NameError):
         type checker, not actually doing anything at runtime. """
         return f
 
+_ = wx.GetTranslation
+
 # Utility function
 def make_boto3_session(settings):
         return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'key' in key})
+
+class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
+    def __init__(self, *args, **kwargs):
+        super(GenericMessageDialog, self).__init__(*args, **kwargs)
+
+    #WHY doesn't this work without this?!?
+    def OnKeyDown(self, evt):
+        if evt.GetKeyCode() == wx.WXK_RETURN:
+            newevt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, self.DefaultItem.GetId())
+            wx.PostEvent(self, newevt)
+        else:
+            super(GenericMessageDialog, self).OnKeyDown(evt)
+
 
 class WaitDlg(vgaming_xrc.xrcdlgWait):
     def __init__(self, parent):
@@ -44,9 +61,15 @@ class WaitDlgThread(threading.Thread):
 
     def start(self):
         with self.dlg:
+            parent = self.dlg.GetParent()
             super(WaitDlgThread, self).start()
-            self.dlg.ShowModal()
+            ret = self.dlg.ShowModal()
         self.join()
+        if ret == wx.ID_ABORT:
+            with GenericMessageDialog(parent, self._exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
+                errdlg.SetExtendedMessage(self._exc_string)
+                errdlg.ShowModal()
+
 
     @final
     def run(self):
@@ -55,6 +78,8 @@ class WaitDlgThread(threading.Thread):
             self.process()
             wx.CallAfter(self.dlg.EndModal, wx.ID_OK)
         except:
+            self._exc_message = _("Exception in thread %s") % (self.name,)
+            self._exc_string = format_exc()
             wx.CallAfter(self.dlg.EndModal, wx.ID_ABORT)
             raise
 
