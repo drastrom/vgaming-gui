@@ -68,13 +68,23 @@ class ErrorDlgThread(threading.Thread):
     def run(self):
         """ Don't override this anymore, override process instead. """
         try:
+            self.pre_process()
             self.process()
-            del self.parent
+            self.on_complete()
         except:
-            exc_message = _("Exception in thread %s") % (self.name,)
-            exc_string = format_exc()
-            wx.CallAfter(self._show_error, exc_message, exc_string)
+            self.on_error()
             raise
+
+    def pre_process(self):
+        pass
+
+    def on_complete(self):
+        del self.parent
+
+    def on_error(self):
+        exc_message = _("Exception in thread %s") % (self.name,)
+        exc_string = format_exc()
+        wx.CallAfter(self._show_error, exc_message, exc_string)
 
     def process(self):
         """ @see threading.Thread.run """
@@ -87,37 +97,29 @@ class ErrorDlgThread(threading.Thread):
         del self.parent
 
 
-class WaitDlgThread(threading.Thread):
+class WaitDlgThread(ErrorDlgThread):
     def __init__(self, parent, **kwargs):
-        super(WaitDlgThread, self).__init__(**kwargs)
+        super(WaitDlgThread, self).__init__(parent, **kwargs)
         self.dlg = WaitDlg(parent)
 
     def start(self):
         with self.dlg:
-            parent = self.dlg.GetParent()
             super(WaitDlgThread, self).start()
             ret = self.dlg.ShowModal()
         self.join()
-        if ret == wx.ID_ABORT:
-            with GenericMessageDialog(parent, self._exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
-                errdlg.SetExtendedMessage(self._exc_string)
-                errdlg.ShowModal()
 
-    @final
-    def run(self):
-        """ Don't override this anymore, override process instead. """
-        try:
-            self.process()
-            wx.CallAfter(self.dlg.EndModal, wx.ID_OK)
-        except:
-            self._exc_message = _("Exception in thread %s") % (self.name,)
-            self._exc_string = format_exc()
-            wx.CallAfter(self.dlg.EndModal, wx.ID_ABORT)
-            raise
+    def on_complete(self):
+        wx.CallAfter(self.dlg.EndModal, wx.ID_OK)
+        super(WaitDlgThread, self).on_complete()
+
+    def on_error(self):
+        wx.CallAfter(self.dlg.EndModal, wx.ID_ABORT)
+        super(WaitDlgThread, self).on_error()
 
     def process(self):
         """ @see threading.Thread.run """
         super(WaitDlgThread, self).run()
+
 
 class DescribeInstancesThread(WaitDlgThread):
     def __init__(self, parent):
