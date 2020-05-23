@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import boto3, botocore
+import itertools
 import json
 import threading
 import time
@@ -20,7 +21,8 @@ _ = wx.GetTranslation
 
 # Utility function
 def make_boto3_session(settings):
-        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'key' in key})
+        #return boto3.session.Session(aws_access_key_id=self.settings["access_key_id"], aws_secret_access_key=self.settings["secret_access_key"], region_name=self.settings["region"])
+        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key})
 
 class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
     def __init__(self, *args, **kwargs):
@@ -94,7 +96,6 @@ class DescribeInstancesThread(WaitDlgThread):
         self.settings = dict(wx.GetApp().settings)
 
     def process(self):
-        #session = boto3.session.Session(aws_access_key_id=self.settings["access_key_id"], aws_secret_access_key=self.settings["secret_access_key"], region_name=self.settings["region"])
         session = make_boto3_session(self.settings)
         ec2 = session.client('ec2')
         ret = ec2.describe_instances(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
@@ -111,11 +112,15 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         super(SettingsDlg, self).__init__(parent)
 
     def OnInit_dialog(self, evt):
+        self.decryptionTypeRadios = (self.radioOSSLFile, self.radioOSSLPKCS11, self.radioGPGSCD)
         app = wx.GetApp()
         self.ctlRegion.SetValue(app.settings.get("region", ""))
         self.ctlAccessKey.SetValue(app.settings.get("access_key_id", ""))
         self.ctlSecret.SetValue(app.settings.get("secret_access_key", ""))
         self.ctlLaunchTemplate.SetValue(app.settings.get("launch_template_id", ""))
+        self.ctlKeyFileURI.SetValue(app.settings.get("decryption_key_file_uri", ""))
+        decryption_type = app.settings.get("decryption_type", 0)
+        self.decryptionTypeRadios[decryption_type if decryption_type >= 0 and decryption_type < len(self.decryptionTypeRadios) else 0].SetValue(True)
 
     def Save(self):
         app = wx.GetApp()
@@ -124,6 +129,11 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         settings["access_key_id"] = self.ctlAccessKey.GetValue()
         settings["secret_access_key"] = self.ctlSecret.GetValue()
         settings["launch_template_id"] = self.ctlLaunchTemplate.GetValue()
+        settings["decryption_key_file_uri"] = self.ctlKeyFileURI.GetValue()
+        for i, radio in itertools.izip(itertools.count(), self.decryptionTypeRadios):
+            if radio.GetValue():
+                settings["decryption_type"] = i
+                break
         app.SaveSettings(settings)
 
     def OnButton_wxID_OK(self, evt):

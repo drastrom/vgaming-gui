@@ -36,6 +36,11 @@ class xrcmainframe(wx.Frame):
         self.PostCreate(pre)
 
         # Define variables for the controls, bind event handlers
+        self.ctlStatus = xrc.XRCCTRL(self, "ctlStatus")
+        self.ctlInstanceId = xrc.XRCCTRL(self, "ctlInstanceId")
+        self.ctlSpotId = xrc.XRCCTRL(self, "ctlSpotId")
+        self.ctlPublicIP = xrc.XRCCTRL(self, "ctlPublicIP")
+        self.ctlPassword = xrc.XRCCTRL(self, "ctlPassword")
 
         self.Bind(wx.EVT_MENU, self.OnMenu_wxID_EXIT, id=wx.ID_EXIT)
         self.Bind(wx.EVT_MENU, self.OnMenu_itmSettings, id=xrc.XRCID('itmSettings'))
@@ -105,6 +110,10 @@ class xrcdlgSettings(wx.Dialog):
         self.ctlAccessKey = xrc.XRCCTRL(self, "ctlAccessKey")
         self.ctlSecret = xrc.XRCCTRL(self, "ctlSecret")
         self.ctlLaunchTemplate = xrc.XRCCTRL(self, "ctlLaunchTemplate")
+        self.ctlKeyFileURI = xrc.XRCCTRL(self, "ctlKeyFileURI")
+        self.radioOSSLFile = xrc.XRCCTRL(self, "radioOSSLFile")
+        self.radioOSSLPKCS11 = xrc.XRCCTRL(self, "radioOSSLPKCS11")
+        self.radioGPGSCD = xrc.XRCCTRL(self, "radioGPGSCD")
 
         self.Bind(wx.EVT_BUTTON, self.OnButton_wxID_OK, id=xrc.XRCID('wxID_OK'))
         self.Bind(wx.EVT_BUTTON, self.OnButton_wxID_CANCEL, id=xrc.XRCID('wxID_CANCEL'))
@@ -192,7 +201,7 @@ def __init_resources():
     wx.FileSystem.AddHandler(wx.MemoryFSHandler())
 
     vgaming_xrc = '''\
-<?xml version="1.0" ?><resource class="spacer">
+<?xml version="1.0" ?><resource class="wxBoxSizer">
   <object class="wxFrame" name="mainframe">
     <object class="wxMenuBar" name="menuBar">
       <object class="wxMenu" name="mnuFile">
@@ -229,8 +238,11 @@ def __init_resources():
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlStatus">
               <enabled>0</enabled>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
             </object>
-            <flag>wxEXPAND</flag>
+            <flag>wxRIGHT|wxEXPAND</flag>
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
@@ -241,8 +253,11 @@ def __init_resources():
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlInstanceId">
               <enabled>0</enabled>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
             </object>
-            <flag>wxEXPAND</flag>
+            <flag>wxRIGHT|wxEXPAND</flag>
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
@@ -253,8 +268,11 @@ def __init_resources():
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlSpotId">
               <enabled>0</enabled>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
             </object>
-            <flag>wxEXPAND</flag>
+            <flag>wxRIGHT|wxEXPAND</flag>
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
@@ -265,13 +283,31 @@ def __init_resources():
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlPublicIP">
               <enabled>0</enabled>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
             </object>
-            <flag>wxEXPAND</flag>
+            <flag>wxRIGHT|wxEXPAND</flag>
           </object>
           <cols>2</cols>
           <vgap>4</vgap>
           <hgap>2</hgap>
           <growablecols>1</growablecols>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Password</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlPassword">
+              <enabled>0</enabled>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
         </object>
         <flag>wxALL|wxEXPAND|wxGROW</flag>
         <border>7</border>
@@ -392,8 +428,55 @@ def __init_resources():
           <hgap>2</hgap>
           <growablecols>1</growablecols>
           <growablerows/>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Key File/URI</label>
+            </object>
+            <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ctlKeyFileURI">
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxRIGHT|wxEXPAND</flag>
+          </object>
         </object>
         <flag>wxALL|wxEXPAND|wxGROW</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <label>Password Decryption</label>
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxRadioButton" name="radioOSSLFile">
+              <label>OpenSSL &amp;File</label>
+              <style>wxRB_GROUP</style>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxRadioButton" name="radioOSSLPKCS11">
+              <label>OpenSSL &amp;PKCS#11</label>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxRadioButton" name="radioGPGSCD">
+              <label>GnuPG &amp;SCDaemon</label>
+              <XRCED>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+          </object>
+        </object>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
         <border>7</border>
       </object>
       <object class="sizeritem">
@@ -488,6 +571,7 @@ def __gettext_strings():
     _("Instance ID")
     _("Spot Request ID")
     _("Public IP")
+    _("Password")
     _("Start")
     _("Stop")
     _("RDP")
@@ -497,6 +581,11 @@ def __gettext_strings():
     _("Access key ID")
     _("Secret access key")
     _("Launch template ID")
+    _("Key File/URI")
+    _("Password Decryption")
+    _("OpenSSL &File")
+    _("OpenSSL &PKCS#11")
+    _("GnuPG &SCDaemon")
     _("&OK")
     _("&Cancel")
     _("&Apply")
