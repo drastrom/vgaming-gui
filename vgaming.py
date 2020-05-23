@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+import base64
 import boto3, botocore
 import itertools
 import json
+import os
+import subprocess
 import threading
 import time
 from traceback import format_exc
@@ -56,6 +59,34 @@ class WaitDlg(vgaming_xrc.xrcdlgWait):
     def OnWindow_destroy(self, evt):
         self.timer.Stop()
 
+class ErrorDlgThread(threading.Thread):
+    def __init__(self, parent, **kwargs):
+        super(ErrorDlgThread, self).__init__(**kwargs)
+        self.parent = parent
+
+    @final
+    def run(self):
+        """ Don't override this anymore, override process instead. """
+        try:
+            self.process()
+            del self.parent
+        except:
+            exc_message = _("Exception in thread %s") % (self.name,)
+            exc_string = format_exc()
+            wx.CallAfter(self._show_error, exc_message, exc_string)
+            raise
+
+    def process(self):
+        """ @see threading.Thread.run """
+        super(ErrorDlgThread, self).run()
+
+    def _show_error(self, exc_message, exc_string):
+        with GenericMessageDialog(self.parent, exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
+            errdlg.SetExtendedMessage(exc_string)
+            errdlg.ShowModal()
+        del self.parent
+
+
 class WaitDlgThread(threading.Thread):
     def __init__(self, parent, **kwargs):
         super(WaitDlgThread, self).__init__(**kwargs)
@@ -71,7 +102,6 @@ class WaitDlgThread(threading.Thread):
             with GenericMessageDialog(parent, self._exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
                 errdlg.SetExtendedMessage(self._exc_string)
                 errdlg.ShowModal()
-
 
     @final
     def run(self):
@@ -106,6 +136,49 @@ class DescribeInstancesThread(WaitDlgThread):
         ret = ec2.describe_launch_templates(LaunchTemplateIds=[self.settings["launch_template_id"]])
         print (ret)
         print (ret["LaunchTemplates"][0]["LaunchTemplateName"])
+
+class WaitForPasswordThread(ErrorDlgThread):
+    def __init__(self, parent, instance_id):
+        super(WaitForPasswordThread, self).__init__(parent)
+        self.instance_id = instance_id
+        # make a consistent copy
+        self.settings = dict(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        waiter = ec2.get_waiter("password_data_available")
+        waiter.wait(InstanceId=self.instance_id)
+        pwdata = ec2.get_password_data(InstanceId=self.instance_id)["PasswordData"]
+        pwdata = base64.b64decode(pwdata)
+        if self.settings["decryption_type"] == 0:
+            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ret = x.communicate(pwdata)
+            print ret, x.returncode
+            if x.returncode != 0:
+                raise subprocess.CalledProcessError(x.returncode, "openssl", ret[1])
+            password = ret[0]
+        elif self.settings["decryption_type"] == 1:
+            env = os.environ.copy()
+            env["OPENSC_DRIVER"] = "openpgp"
+            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-keyform", "ENGINE", "-engine", "pkcs11", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+            ret = x.communicate(pwdata)
+            print ret, x.returncode
+            if x.returncode != 0:
+                raise subprocess.CalledProcessError(x.returncode, "openssl", ret[1])
+            password = ret[0]
+        elif self.settings["decryption_type"] == 2:
+            x = subprocess.Popen(["gpg-connect-agent", 'SCD SETDATA ' + base64.b16encode(pwdata), 'SCD PKDECRYPT ' + self.settings["decryption_key_file_uri"], '/bye'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ret = x.communicate()
+            print ret, x.returncode
+            if x.returncode != 0:
+                raise subprocess.CalledProcessError(x.returncode, "gpg-connect-agent", ret[1])
+            for line in ret[0].split("\n"):
+                if line[:2] == "D ":
+                    password = line[2:]
+                elif line[:4] == "ERR ":
+                    raise RuntimeError(line[4:])
+        wx.CallAfter(self.parent.ctlPassword.SetValue, password)
 
 class SettingsDlg(vgaming_xrc.xrcdlgSettings):
     def __init__(self, parent):
