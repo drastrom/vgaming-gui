@@ -221,11 +221,29 @@ class WaitForPublicIPThread(ErrorDlgThread):
         session = make_boto3_session(self.settings)
         ec2 = session.client('ec2')
         waiter = ec2.get_waiter("instance_running")
-        waiter.wait(InstanceId=self.instance_id)
+        waiter.wait(InstanceIds=[self.instance_id])
         # stupid waiter only gives you the last result on error, not success
         ret = ec2.describe_instances(InstanceIds=[self.instance_id])
         instance = ret["Reservations"][0]["Instances"][0]
         wx.CallAfter(self.parent.ctlPublicIP.SetValue, instance["PublicIpAddress"])
+
+
+class WaitForTerminationThread(ErrorDlgThread):
+    def __init__(self, parent, instance_id):
+        super(WaitForTerminationThread, self).__init__(parent)
+        self.instance_id = instance_id
+        # make a consistent copy
+        self.settings = deepcopy(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        waiter = ec2.get_waiter("instance_terminated")
+        waiter.wait(InstanceIds=[self.instance_id])
+        # stupid waiter only gives you the last result on error, not success
+        ret = ec2.describe_instances(InstanceIds=[self.instance_id])
+        instance = ret["Reservations"][0]["Instances"][0]
+        wx.CallAfter(self.parent.ctlStatus.SetValue, instance["State"]["Name"])
 
 
 class StartInstanceThread(WaitDlgThread):
@@ -248,6 +266,22 @@ class StartInstanceThread(WaitDlgThread):
         parent.ctlStatus.SetValue(state)
         parent.ctlInstanceId.SetValue(instance_id)
         parent.ctlSpotId.SetValue(spot_instance_request_id)
+
+
+class TerminateInstanceThread(WaitDlgThread):
+    def __init__(self, parent, instance_id):
+        super(TerminateInstanceThread, self).__init__(parent)
+        self.instance_id = instance_id
+        # make a consistent copy
+        self.settings = deepcopy(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        ret = ec2.terminate_instances(InstanceIds=[self.instance_id])
+        instance = ret["TerminatingInstances"][0]
+        wx.CallAfter(self.parent.ctlStatus.SetValue, instance["CurrentState"]["Name"])
+        WaitForTerminationThread(self.parent, self.instance_id).start()
 
 
 class DescribeSubnetsThread(WaitDlgThread):
@@ -345,8 +379,8 @@ class MainFrame(vgaming_xrc.xrcmainframe):
                 #thread.start()
 
     def OnButton_btnStop(self, evt):
-        # Replace with event handler code
-        pass
+        thread = TerminateInstanceThread(self, self.ctlInstanceId.GetValue())
+        thread.start()
 
     def OnButton_btnRDP(self, evt):
         # Replace with event handler code
