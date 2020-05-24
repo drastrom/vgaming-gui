@@ -44,6 +44,7 @@ class xrcmainframe(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnMenu_wxID_EXIT, id=wx.ID_EXIT)
         self.Bind(wx.EVT_MENU, self.OnMenu_itmSettings, id=xrc.XRCID('itmSettings'))
+        self.Bind(wx.EVT_MENU, self.OnMenu_itmRefresh, id=xrc.XRCID('itmRefresh'))
         self.Bind(wx.EVT_BUTTON, self.OnButton_btnStart, id=xrc.XRCID('btnStart'))
         self.Bind(wx.EVT_BUTTON, self.OnButton_btnStop, id=xrc.XRCID('btnStop'))
         self.Bind(wx.EVT_BUTTON, self.OnButton_btnRDP, id=xrc.XRCID('btnRDP'))
@@ -60,6 +61,12 @@ class xrcmainframe(wx.Frame):
         # Replace with event handler code
         print "OnMenu_itmSettings()"
 #!XRCED:end-block:xrcmainframe.OnMenu_itmSettings        
+
+#!XRCED:begin-block:xrcmainframe.OnMenu_itmRefresh
+    def OnMenu_itmRefresh(self, evt):
+        # Replace with event handler code
+        print "OnMenu_itmRefresh()"
+#!XRCED:end-block:xrcmainframe.OnMenu_itmRefresh        
 
 #!XRCED:begin-block:xrcmainframe.OnButton_btnStart
     def OnButton_btnStart(self, evt):
@@ -272,6 +279,17 @@ def __init_resources():
         <object class="wxMenuItem" name="itmSettings">
           <label>&amp;Settings...</label>
           <bitmap stock_id="wxART_HELP_SETTINGS"/>
+          <accel>Ctrl-E</accel>
+          <XRCED>
+            <events>EVT_MENU</events>
+          </XRCED>
+        </object>
+      </object>
+      <object class="wxMenu" name="mnuView">
+        <label>&amp;View</label>
+        <object class="wxMenuItem" name="itmRefresh">
+          <label>&amp;Refresh</label>
+          <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
@@ -678,6 +696,8 @@ def __gettext_strings():
     _("&File")
     _("&Edit")
     _("&Settings...")
+    _("&View")
+    _("&Refresh")
     _("Status")
     _("Instance ID")
     _("Spot Request ID")

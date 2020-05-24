@@ -336,10 +336,6 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         super(MainFrame, self).__init__(parent)
 
     def OnButton_btnStart(self, evt):
-        thread = DescribeInstancesThread(self)
-        thread.start()
-
-    def OnButton_btnStop(self, evt):
         thread = DescribeSubnetsThread(self)
         thread.start()
         with PickSubnetDlg(self, thread.subnets) as picker:
@@ -347,6 +343,10 @@ class MainFrame(vgaming_xrc.xrcmainframe):
                 print picker.chosen_subnet
                 #thread = StartInstanceThread(self, picker.chosen_subnet)
                 #thread.start()
+
+    def OnButton_btnStop(self, evt):
+        # Replace with event handler code
+        pass
 
     def OnButton_btnRDP(self, evt):
         # Replace with event handler code
@@ -362,6 +362,10 @@ class MainFrame(vgaming_xrc.xrcmainframe):
     def OnMenu_itmSettings(self, evt):
         with SettingsDlg(self) as dlg:
             dlg.ShowModal()
+
+    def OnMenu_itmRefresh(self, evt):
+        thread = DescribeInstancesThread(self)
+        thread.start()
 
 
 class VGamingApp(wx.App):

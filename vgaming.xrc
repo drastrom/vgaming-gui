@@ -17,6 +17,17 @@
         <object class="wxMenuItem" name="itmSettings">
           <label>&amp;Settings...</label>
           <bitmap stock_id="wxART_HELP_SETTINGS"/>
+          <accel>Ctrl-E</accel>
+          <XRCED>
+            <events>EVT_MENU</events>
+          </XRCED>
+        </object>
+      </object>
+      <object class="wxMenu" name="mnuView">
+        <label>&amp;View</label>
+        <object class="wxMenuItem" name="itmRefresh">
+          <label>&amp;Refresh</label>
+          <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
