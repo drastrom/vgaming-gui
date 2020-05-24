@@ -27,6 +27,7 @@ def make_boto3_session(settings):
         #return boto3.session.Session(aws_access_key_id=self.settings["access_key_id"], aws_secret_access_key=self.settings["secret_access_key"], region_name=self.settings["region"])
         return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key})
 
+
 class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
     def __init__(self, *args, **kwargs):
         super(GenericMessageDialog, self).__init__(*args, **kwargs)
@@ -59,10 +60,10 @@ class WaitDlg(vgaming_xrc.xrcdlgWait):
     def OnWindow_destroy(self, evt):
         self.timer.Stop()
 
-class ErrorDlgThread(threading.Thread):
-    def __init__(self, parent, **kwargs):
-        super(ErrorDlgThread, self).__init__(**kwargs)
-        self.parent = parent
+
+class BaseThread(threading.Thread):
+    def __init__(self, **kwargs):
+        super(BaseThread, self).__init__(**kwargs)
 
     @final
     def run(self):
@@ -79,16 +80,28 @@ class ErrorDlgThread(threading.Thread):
         pass
 
     def on_complete(self):
+        pass
+
+    def on_error(self):
+        pass
+
+    def process(self):
+        """ @see threading.Thread.run """
+        super(BaseThread, self).run()
+
+
+class ErrorDlgThread(BaseThread):
+    def __init__(self, parent, **kwargs):
+        super(ErrorDlgThread, self).__init__(**kwargs)
+        self.parent = parent
+
+    def on_complete(self):
         del self.parent
 
     def on_error(self):
         exc_message = _("Exception in thread %s") % (self.name,)
         exc_string = format_exc()
         wx.CallAfter(self._show_error, exc_message, exc_string)
-
-    def process(self):
-        """ @see threading.Thread.run """
-        super(ErrorDlgThread, self).run()
 
     def _show_error(self, exc_message, exc_string):
         with GenericMessageDialog(self.parent, exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
@@ -105,7 +118,7 @@ class WaitDlgThread(ErrorDlgThread):
     def start(self):
         with self.dlg:
             super(WaitDlgThread, self).start()
-            ret = self.dlg.ShowModal()
+            self.dlg.ShowModal()
         self.join()
 
     def on_complete(self):
@@ -115,10 +128,6 @@ class WaitDlgThread(ErrorDlgThread):
     def on_error(self):
         wx.CallAfter(self.dlg.EndModal, wx.ID_ABORT)
         super(WaitDlgThread, self).on_error()
-
-    def process(self):
-        """ @see threading.Thread.run """
-        super(WaitDlgThread, self).run()
 
 
 class DescribeInstancesThread(WaitDlgThread):
@@ -138,6 +147,7 @@ class DescribeInstancesThread(WaitDlgThread):
         ret = ec2.describe_launch_templates(LaunchTemplateIds=[self.settings["launch_template_id"]])
         print (ret)
         print (ret["LaunchTemplates"][0]["LaunchTemplateName"])
+
 
 class WaitForPasswordThread(ErrorDlgThread):
     def __init__(self, parent, instance_id):
@@ -182,6 +192,7 @@ class WaitForPasswordThread(ErrorDlgThread):
                     raise RuntimeError(line[4:])
         wx.CallAfter(self.parent.ctlPassword.SetValue, password)
 
+
 class SettingsDlg(vgaming_xrc.xrcdlgSettings):
     def __init__(self, parent):
         super(SettingsDlg, self).__init__(parent)
@@ -225,6 +236,7 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         print "apply"
         self.Save()
 
+
 class MainFrame(vgaming_xrc.xrcmainframe):
     def __init__(self, parent):
         super(MainFrame, self).__init__(parent)
@@ -252,6 +264,7 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         with SettingsDlg(self) as dlg:
             dlg.ShowModal()
 
+
 class VGamingApp(wx.App):
     def __init__(self):
         super(VGamingApp, self).__init__()
@@ -271,6 +284,7 @@ class VGamingApp(wx.App):
         self.mainframe = MainFrame(None)
         self.mainframe.Show()
         return True
+
 
 app = VGamingApp()
 if __name__ == "__main__":
