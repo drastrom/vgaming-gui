@@ -2,6 +2,7 @@
 
 import base64
 import boto3, botocore
+from copy import deepcopy
 import itertools
 import json
 import os
@@ -134,7 +135,7 @@ class DescribeInstancesThread(WaitDlgThread):
     def __init__(self, parent):
         super(DescribeInstancesThread, self).__init__(parent)
         # make a consistent copy
-        self.settings = dict(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
         session = make_boto3_session(self.settings)
@@ -154,7 +155,7 @@ class WaitForPasswordThread(ErrorDlgThread):
         super(WaitForPasswordThread, self).__init__(parent)
         self.instance_id = instance_id
         # make a consistent copy
-        self.settings = dict(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
         session = make_boto3_session(self.settings)
@@ -210,7 +211,7 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
 
     def Save(self):
         app = wx.GetApp()
-        settings = dict(app.settings)
+        settings = deepcopy(app.settings)
         settings["region"] = self.ctlRegion.GetValue()
         settings["access_key_id"] = self.ctlAccessKey.GetValue()
         settings["secret_access_key"] = self.ctlSecret.GetValue()
