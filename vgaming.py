@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import atexit
 import base64
 import boto3, botocore
 from copy import deepcopy
@@ -7,6 +8,8 @@ import itertools
 import json
 import os
 import subprocess
+import sys
+import tempfile
 import threading
 import time
 from traceback import format_exc
@@ -382,12 +385,35 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         thread.start()
 
     def OnButton_btnRDP(self, evt):
-        # Replace with event handler code
-        pass
+        with tempfile.NamedTemporaryFile(suffix=".rdp", mode="wb", delete=False) as fp:
+            atexit.register(os.unlink, fp.name)
+            tmpfile = fp.name
+            fp.write("""full address:s:%s\r
+username:s:Administrator\r
+password:s:%s\r
+connect to console:i:1\r
+administrative session:i:1\r
+""" % (self.ctlPublicIP.GetValue(), self.ctlPassword.GetValue()))
+        if sys.platform in ('win32', 'cygwin'):
+            subprocess.Popen(["mstsc", tmpfile])
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", tmpfile])
+        else:
+            subprocess.Popen(["xfreerdp", tmpfile])
 
     def OnButton_btnDCV(self, evt):
-        # Replace with event handler code
-        pass
+        with tempfile.NamedTemporaryFile(suffix=".dcv", mode="w", delete=False) as fp:
+            atexit.register(os.unlink, fp.name)
+            tmpfile = fp.name
+            fp.write("""[version]
+format=1.0
+
+[connect]
+host=%s
+user=Administrator
+password=%s
+""" % (self.ctlPublicIP.GetValue(), self.ctlPassword.GetValue()))
+        subprocess.Popen(["dcvviewer", tmpfile])
 
     def OnMenu_wxID_EXIT(self, evt):
         self.Close()
