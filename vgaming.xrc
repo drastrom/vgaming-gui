@@ -339,9 +339,67 @@
     </object>
     <title>Please wait...</title>
     <centered>1</centered>
-    <style>wxCLIP_CHILDREN|wxCAPTION|wxSYSTEM_MENU</style>
+    <style>wxCLIP_CHILDREN|wxCAPTION|wxSTAY_ON_TOP|wxSYSTEM_MENU</style>
     <XRCED>
       <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
+    </XRCED>
+  </object>
+  <object class="wxDialog" name="dlgSubnetPicker">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <object class="sizeritem">
+            <object class="wxChoice" name="choiceSubnet">
+              <size>200,-1</size>
+              <content>
+                <item/>
+              </content>
+              <XRCED>
+                <events>EVT_CHOICE</events>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>7</border>
+          </object>
+          <label>Subnet</label>
+          <orient>wxVERTICAL</orient>
+        </object>
+        <flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxGROW</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <label>&amp;OK</label>
+              <default>1</default>
+              <enabled>0</enabled>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL">
+              <label>&amp;Cancel</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+          </object>
+        </object>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTRE|wxALIGN_BOTTOM</flag>
+        <border>7</border>
+      </object>
+    </object>
+    <title>Select a subnet</title>
+    <centered>1</centered>
+    <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
+    <XRCED>
+      <events>EVT_INIT_DIALOG</events>
     </XRCED>
   </object>
 </resource>

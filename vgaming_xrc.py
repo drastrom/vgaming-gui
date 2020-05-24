@@ -190,6 +190,59 @@ class xrcdlgWait(wx.Dialog):
 #!XRCED:end-block:xrcdlgWait.OnWindow_destroy        
 
 
+class xrcdlgSubnetPicker(wx.Dialog):
+#!XRCED:begin-block:xrcdlgSubnetPicker.PreCreate
+    def PreCreate(self, pre):
+        """ This function is called during the class's initialization.
+        
+        Override it for custom setup before the window is created usually to
+        set additional window styles using SetWindowStyle() and SetExtraStyle().
+        """
+        pass
+        
+#!XRCED:end-block:xrcdlgSubnetPicker.PreCreate
+
+    def __init__(self, parent):
+        # Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+        pre = wx.PreDialog()
+        self.PreCreate(pre)
+        get_resources().LoadOnDialog(pre, parent, "dlgSubnetPicker")
+        self.PostCreate(pre)
+
+        # Define variables for the controls, bind event handlers
+        self.choiceSubnet = xrc.XRCCTRL(self, "choiceSubnet")
+        self.wxID_OK = xrc.XRCCTRL(self, "wxID_OK")
+
+        self.Bind(wx.EVT_CHOICE, self.OnChoice_choiceSubnet, self.choiceSubnet)
+        self.Bind(wx.EVT_BUTTON, self.OnButton_wxID_OK, self.wxID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnButton_wxID_CANCEL, id=xrc.XRCID('wxID_CANCEL'))
+        self.Bind(wx.EVT_INIT_DIALOG, self.OnInit_dialog)
+
+#!XRCED:begin-block:xrcdlgSubnetPicker.OnChoice_choiceSubnet
+    def OnChoice_choiceSubnet(self, evt):
+        # Replace with event handler code
+        print "OnChoice_choiceSubnet()"
+#!XRCED:end-block:xrcdlgSubnetPicker.OnChoice_choiceSubnet        
+
+#!XRCED:begin-block:xrcdlgSubnetPicker.OnButton_wxID_OK
+    def OnButton_wxID_OK(self, evt):
+        # Replace with event handler code
+        print "OnButton_wxID_OK()"
+#!XRCED:end-block:xrcdlgSubnetPicker.OnButton_wxID_OK        
+
+#!XRCED:begin-block:xrcdlgSubnetPicker.OnButton_wxID_CANCEL
+    def OnButton_wxID_CANCEL(self, evt):
+        # Replace with event handler code
+        print "OnButton_wxID_CANCEL()"
+#!XRCED:end-block:xrcdlgSubnetPicker.OnButton_wxID_CANCEL        
+
+#!XRCED:begin-block:xrcdlgSubnetPicker.OnInit_dialog
+    def OnInit_dialog(self, evt):
+        # Replace with event handler code
+        print "OnInit_dialog()"
+#!XRCED:end-block:xrcdlgSubnetPicker.OnInit_dialog        
+
+
 
 
 # ------------------------ Resource data ----------------------
@@ -541,9 +594,67 @@ def __init_resources():
     </object>
     <title>Please wait...</title>
     <centered>1</centered>
-    <style>wxCLIP_CHILDREN|wxCAPTION|wxSYSTEM_MENU</style>
+    <style>wxCLIP_CHILDREN|wxCAPTION|wxSTAY_ON_TOP|wxSYSTEM_MENU</style>
     <XRCED>
       <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
+    </XRCED>
+  </object>
+  <object class="wxDialog" name="dlgSubnetPicker">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <object class="sizeritem">
+            <object class="wxChoice" name="choiceSubnet">
+              <size>200,-1</size>
+              <content>
+                <item/>
+              </content>
+              <XRCED>
+                <events>EVT_CHOICE</events>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>7</border>
+          </object>
+          <label>Subnet</label>
+          <orient>wxVERTICAL</orient>
+        </object>
+        <flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxGROW</flag>
+        <border>7</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <label>&amp;OK</label>
+              <default>1</default>
+              <enabled>0</enabled>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+                <assign_var>1</assign_var>
+              </XRCED>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL">
+              <label>&amp;Cancel</label>
+              <XRCED>
+                <events>EVT_BUTTON</events>
+              </XRCED>
+            </object>
+          </object>
+        </object>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTRE|wxALIGN_BOTTOM</flag>
+        <border>7</border>
+      </object>
+    </object>
+    <title>Select a subnet</title>
+    <centered>1</centered>
+    <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
+    <XRCED>
+      <events>EVT_INIT_DIALOG</events>
     </XRCED>
   </object>
 </resource>'''
@@ -592,4 +703,8 @@ def __gettext_strings():
     _("Settings")
     _("Please wait...")
     _("Please wait...")
+    _("Subnet")
+    _("&OK")
+    _("&Cancel")
+    _("Select a subnet")
 

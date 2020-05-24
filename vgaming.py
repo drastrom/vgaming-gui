@@ -142,12 +142,27 @@ class DescribeInstancesThread(WaitDlgThread):
         ec2 = session.client('ec2')
         ret = ec2.describe_instances(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
         print (ret)
+        instances = sorted((instance for reservation in ret["Reservations"] for instance in reservation["Instances"]), key=lambda instance: instance["LaunchTime"])
+        print (instances)
         #TODO do they tag the spot request or just the instances?
         ret = ec2.describe_spot_instance_requests(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
         print (ret)
         ret = ec2.describe_launch_templates(LaunchTemplateIds=[self.settings["launch_template_id"]])
         print (ret)
         print (ret["LaunchTemplates"][0]["LaunchTemplateName"])
+        if len(instances) > 0:
+            instance = instances[-1]
+            public_ip = instance.get("PublicIpAddress", "")
+            wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance["InstanceId"], instance["SpotInstanceRequestId"], public_ip)
+            #if public_ip == "":
+            #    WaitForPublicIPThread(self.parent, instance["InstanceId"]).start()
+            #WaitForPasswordThread(self.parent, instance["InstanceId"]).start()
+
+    def _update_ui(self, parent, state, instance_id, spot_instance_request_id, public_ip):
+        parent.ctlStatus.SetValue(state)
+        parent.ctlInstanceId.SetValue(instance_id)
+        parent.ctlSpotId.SetValue(spot_instance_request_id)
+        parent.ctlPublicIP.SetValue(public_ip)
 
 
 class WaitForPasswordThread(ErrorDlgThread):
@@ -162,6 +177,7 @@ class WaitForPasswordThread(ErrorDlgThread):
         ec2 = session.client('ec2')
         waiter = ec2.get_waiter("password_data_available")
         waiter.wait(InstanceId=self.instance_id)
+        # stupid waiter only gives you the last result on error, not success
         pwdata = ec2.get_password_data(InstanceId=self.instance_id)["PasswordData"]
         pwdata = base64.b64decode(pwdata)
         if self.settings["decryption_type"] == 0:
@@ -192,6 +208,83 @@ class WaitForPasswordThread(ErrorDlgThread):
                 elif line[:4] == "ERR ":
                     raise RuntimeError(line[4:])
         wx.CallAfter(self.parent.ctlPassword.SetValue, password)
+
+
+class WaitForPublicIPThread(ErrorDlgThread):
+    def __init__(self, parent, instance_id):
+        super(WaitForPublicIPThread, self).__init__(parent)
+        self.instance_id = instance_id
+        # make a consistent copy
+        self.settings = deepcopy(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        waiter = ec2.get_waiter("instance_running")
+        waiter.wait(InstanceId=self.instance_id)
+        # stupid waiter only gives you the last result on error, not success
+        ret = ec2.describe_instances(InstanceIds=[self.instance_id])
+        instance = ret["Reservations"][0]["Instances"][0]
+        wx.CallAfter(self.parent.ctlPublicIP.SetValue, instance["PublicIpAddress"])
+
+
+class StartInstanceThread(WaitDlgThread):
+    def __init__(self, parent, subnet_id):
+        super(StartInstanceThread, self).__init__(parent)
+        self.subnet_id = subnet_id
+        # make a consistent copy
+        self.settings = deepcopy(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        ret = ec2.run_instances(LaunchTemplate={"LaunchTemplateId": self.settings["launch_template_id"]}, NetworkInterfaces=[{"DeviceIndex": 0, "SubnetId": self.subnet_id}])
+        instance = ret["Instances"][0]
+        wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance["InstanceId"], instance["SpotInstanceRequestId"])
+        WaitForPublicIPThread(self.parent, instance["InstanceId"]).start()
+        WaitForPasswordThread(self.parent, instance["InstanceId"]).start()
+
+    def _update_ui(self, parent, state, instance_id, spot_instance_request_id):
+        parent.ctlStatus.SetValue(state)
+        parent.ctlInstanceId.SetValue(instance_id)
+        parent.ctlSpotId.SetValue(spot_instance_request_id)
+
+
+class DescribeSubnetsThread(WaitDlgThread):
+    def __init__(self, parent):
+        super(DescribeSubnetsThread, self).__init__(parent)
+        # make a consistent copy
+        self.settings = deepcopy(wx.GetApp().settings)
+
+    def process(self):
+        session = make_boto3_session(self.settings)
+        ec2 = session.client('ec2')
+        ret = ec2.describe_subnets(Filters=[{"Name": "state", "Values": ["available"]}])
+        self.subnets = {subnet["SubnetId"]: next((tag["Value"] for tag in subnet["Tags"] if tag["Key"] == "Name"), "") for subnet in ret["Subnets"]}
+        print (self.subnets)
+
+
+class PickSubnetDlg(vgaming_xrc.xrcdlgSubnetPicker):
+    def __init__(self, parent, subnets):
+        super(PickSubnetDlg, self).__init__(parent)
+        self.subnets = subnets
+
+    def OnInit_dialog(self, evt):
+        self.choiceSubnet.Clear()
+        for subnet_id, subnet_name in self.subnets.iteritems():
+            self.choiceSubnet.Append(subnet_name, subnet_id)
+
+    def OnChoice_choiceSubnet(self, evt):
+        self.wxID_OK.Enable(evt.Selection != wx.NOT_FOUND)
+
+    def OnButton_wxID_OK(self, evt):
+        selection = self.choiceSubnet.GetSelection()
+        if selection != wx.NOT_FOUND:
+            self.chosen_subnet = self.choiceSubnet.GetClientData(selection)
+            self.EndModal(wx.ID_OK)
+
+    def OnButton_wxID_CANCEL(self, evt):
+        self.EndModal(wx.ID_CANCEL)
 
 
 class SettingsDlg(vgaming_xrc.xrcdlgSettings):
@@ -247,8 +340,13 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         thread.start()
 
     def OnButton_btnStop(self, evt):
-        # Replace with event handler code
-        pass
+        thread = DescribeSubnetsThread(self)
+        thread.start()
+        with PickSubnetDlg(self, thread.subnets) as picker:
+            if picker.ShowModal() == wx.ID_OK:
+                print picker.chosen_subnet
+                #thread = StartInstanceThread(self, picker.chosen_subnet)
+                #thread.start()
 
     def OnButton_btnRDP(self, evt):
         # Replace with event handler code
