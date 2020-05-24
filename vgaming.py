@@ -153,10 +153,11 @@ class DescribeInstancesThread(WaitDlgThread):
         if len(instances) > 0:
             instance = instances[-1]
             public_ip = instance.get("PublicIpAddress", "")
-            wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance["InstanceId"], instance["SpotInstanceRequestId"], public_ip)
-            #if public_ip == "":
-            #    WaitForPublicIPThread(self.parent, instance["InstanceId"]).start()
-            #WaitForPasswordThread(self.parent, instance["InstanceId"]).start()
+            instance_id = instance["InstanceId"]
+            wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
+            if public_ip == "":
+                WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
+            WaitForPasswordThread(self.parent, self.settings, instance_id).start()
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id, public_ip):
         parent.ctlStatus.SetValue(state)
@@ -166,11 +167,10 @@ class DescribeInstancesThread(WaitDlgThread):
 
 
 class WaitForPasswordThread(ErrorDlgThread):
-    def __init__(self, parent, instance_id):
+    def __init__(self, parent, settings, instance_id):
         super(WaitForPasswordThread, self).__init__(parent)
         self.instance_id = instance_id
-        # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = settings
 
     def process(self):
         session = make_boto3_session(self.settings)
@@ -211,11 +211,10 @@ class WaitForPasswordThread(ErrorDlgThread):
 
 
 class WaitForPublicIPThread(ErrorDlgThread):
-    def __init__(self, parent, instance_id):
+    def __init__(self, parent, settings, instance_id):
         super(WaitForPublicIPThread, self).__init__(parent)
         self.instance_id = instance_id
-        # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = settings
 
     def process(self):
         session = make_boto3_session(self.settings)
@@ -229,11 +228,10 @@ class WaitForPublicIPThread(ErrorDlgThread):
 
 
 class WaitForTerminationThread(ErrorDlgThread):
-    def __init__(self, parent, instance_id):
+    def __init__(self, parent, settings, instance_id):
         super(WaitForTerminationThread, self).__init__(parent)
         self.instance_id = instance_id
-        # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = settings
 
     def process(self):
         session = make_boto3_session(self.settings)
@@ -258,9 +256,10 @@ class StartInstanceThread(WaitDlgThread):
         ec2 = session.client('ec2')
         ret = ec2.run_instances(LaunchTemplate={"LaunchTemplateId": self.settings["launch_template_id"]}, NetworkInterfaces=[{"DeviceIndex": 0, "SubnetId": self.subnet_id}])
         instance = ret["Instances"][0]
-        wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance["InstanceId"], instance["SpotInstanceRequestId"])
-        WaitForPublicIPThread(self.parent, instance["InstanceId"]).start()
-        WaitForPasswordThread(self.parent, instance["InstanceId"]).start()
+        instance_id = instance["InstanceId"]
+        wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"])
+        WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
+        WaitForPasswordThread(self.parent, self.settings, instance_id).start()
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id):
         parent.ctlStatus.SetValue(state)
@@ -281,7 +280,7 @@ class TerminateInstanceThread(WaitDlgThread):
         ret = ec2.terminate_instances(InstanceIds=[self.instance_id])
         instance = ret["TerminatingInstances"][0]
         wx.CallAfter(self.parent.ctlStatus.SetValue, instance["CurrentState"]["Name"])
-        WaitForTerminationThread(self.parent, self.instance_id).start()
+        WaitForTerminationThread(self.parent, self.settings, self.instance_id).start()
 
 
 class DescribeSubnetsThread(WaitDlgThread):
