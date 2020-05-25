@@ -371,6 +371,7 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
 class MainFrame(vgaming_xrc.xrcmainframe):
     def __init__(self, parent):
         super(MainFrame, self).__init__(parent)
+        wx.CallAfter(self.Refresh)
 
     def OnButton_btnStart(self, evt):
         thread = DescribeSubnetsThread(self)
@@ -424,6 +425,9 @@ password=%s
             dlg.ShowModal()
 
     def OnMenu_itmRefresh(self, evt):
+        self.Refresh()
+
+    def Refresh(self):
         thread = DescribeInstancesThread(self)
         thread.start()
 
