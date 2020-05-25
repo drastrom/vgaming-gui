@@ -159,9 +159,10 @@ class DescribeInstancesThread(WaitDlgThread):
             public_ip = instance.get("PublicIpAddress", "")
             instance_id = instance["InstanceId"]
             wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
-            if public_ip == "":
-                WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
-            WaitForPasswordThread(self.parent, self.settings, instance_id).start()
+            if instance["State"]["Name"] not in ("shutting-down", "terminated", "stopping", "stopped"):
+                if public_ip == "":
+                    WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
+                WaitForPasswordThread(self.parent, self.settings, instance_id).start()
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id, public_ip):
         parent.ctlStatus.SetValue(state)
@@ -228,7 +229,11 @@ class WaitForPublicIPThread(ErrorDlgThread):
         # stupid waiter only gives you the last result on error, not success
         ret = ec2.describe_instances(InstanceIds=[self.instance_id])
         instance = ret["Reservations"][0]["Instances"][0]
-        wx.CallAfter(self.parent.ctlPublicIP.SetValue, instance["PublicIpAddress"])
+        wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance["PublicIpAddress"])
+
+    def _update_ui(self, parent, state, public_ip):
+        parent.ctlStatus.SetValue(state)
+        parent.ctlPublicIP.SetValue(public_ip)
 
 
 class WaitForTerminationThread(ErrorDlgThread):
