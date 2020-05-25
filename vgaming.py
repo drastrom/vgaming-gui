@@ -306,7 +306,7 @@ class DescribeSubnetsThread(WaitDlgThread):
         session = make_boto3_session(self.settings)
         ec2 = session.client('ec2')
         ret = ec2.describe_subnets(Filters=[{"Name": "state", "Values": ["available"]}])
-        self.subnets = {subnet["SubnetId"]: next((tag["Value"] for tag in subnet["Tags"] if tag["Key"] == "Name"), "") for subnet in ret["Subnets"]}
+        self.subnets = {subnet["SubnetId"]: "%s (%s)" % (next((tag["Value"] for tag in subnet["Tags"] if tag["Key"] == "Name"), ""), subnet["AvailabilityZone"]) for subnet in ret["Subnets"]}
         print (self.subnets)
 
 
