@@ -158,7 +158,7 @@ class DescribeInstancesThread(WaitDlgThread):
             instance = instances[-1]
             public_ip = instance.get("PublicIpAddress", "")
             instance_id = instance["InstanceId"]
-            wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
+            wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
             if public_ip == "":
                 WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
             WaitForPasswordThread(self.parent, self.settings, instance_id).start()
@@ -258,10 +258,10 @@ class StartInstanceThread(WaitDlgThread):
     def process(self):
         session = make_boto3_session(self.settings)
         ec2 = session.client('ec2')
-        ret = ec2.run_instances(LaunchTemplate={"LaunchTemplateId": self.settings["launch_template_id"]}, NetworkInterfaces=[{"DeviceIndex": 0, "SubnetId": self.subnet_id}])
+        ret = ec2.run_instances(MinCount=1, MaxCount=1, LaunchTemplate={"LaunchTemplateId": self.settings["launch_template_id"]}, NetworkInterfaces=[{"DeviceIndex": 0, "SubnetId": self.subnet_id}])
         instance = ret["Instances"][0]
         instance_id = instance["InstanceId"]
-        wx.CallAfter(self._update_ui, parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"])
+        wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"])
         WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
         WaitForPasswordThread(self.parent, self.settings, instance_id).start()
 
@@ -379,8 +379,8 @@ class MainFrame(vgaming_xrc.xrcmainframe):
             with PickSubnetDlg(self, thread.subnets) as picker:
                 if picker.ShowModal() == wx.ID_OK:
                     print picker.chosen_subnet
-                    #thread = StartInstanceThread(self, picker.chosen_subnet)
-                    #thread.start()
+                    thread = StartInstanceThread(self, picker.chosen_subnet)
+                    thread.start()
 
     def OnButton_btnStop(self, evt):
         thread = TerminateInstanceThread(self, self.ctlInstanceId.GetValue())
