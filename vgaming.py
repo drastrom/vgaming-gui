@@ -277,16 +277,20 @@ class StartInstanceThread(WaitDlgThread):
 
 
 class TerminateInstanceThread(WaitDlgThread):
-    def __init__(self, parent, instance_id):
+    def __init__(self, parent, instance_id, spot_instance_request_id):
         super(TerminateInstanceThread, self).__init__(parent)
         self.instance_id = instance_id
+        self.spot_instance_request_id = spot_instance_request_id
         # make a consistent copy
         self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
         session = make_boto3_session(self.settings)
         ec2 = session.client('ec2')
+        ret = ec2.cancel_spot_instance_requests(SpotInstanceRequestIds=[self.spot_instance_request_id])
+        print (ret)
         ret = ec2.terminate_instances(InstanceIds=[self.instance_id])
+        print (ret)
         instance = ret["TerminatingInstances"][0]
         wx.CallAfter(self.parent.ctlStatus.SetValue, instance["CurrentState"]["Name"])
         WaitForTerminationThread(self.parent, self.settings, self.instance_id).start()
@@ -388,7 +392,7 @@ class MainFrame(vgaming_xrc.xrcmainframe):
                     thread.start()
 
     def OnButton_btnStop(self, evt):
-        thread = TerminateInstanceThread(self, self.ctlInstanceId.GetValue())
+        thread = TerminateInstanceThread(self, self.ctlInstanceId.GetValue(), self.ctlSpotId.GetValue())
         thread.start()
 
     def OnButton_btnRDP(self, evt):
