@@ -122,8 +122,9 @@ class WaitDlgThread(ErrorDlgThread):
     def start(self):
         with self.dlg:
             super(WaitDlgThread, self).start()
-            self.dlg.ShowModal()
+            ret = self.dlg.ShowModal()
         self.join()
+        return ret
 
     def on_complete(self):
         wx.CallAfter(self.dlg.EndModal, wx.ID_OK)
@@ -373,12 +374,12 @@ class MainFrame(vgaming_xrc.xrcmainframe):
 
     def OnButton_btnStart(self, evt):
         thread = DescribeSubnetsThread(self)
-        thread.start()
-        with PickSubnetDlg(self, thread.subnets) as picker:
-            if picker.ShowModal() == wx.ID_OK:
-                print picker.chosen_subnet
-                #thread = StartInstanceThread(self, picker.chosen_subnet)
-                #thread.start()
+        if thread.start() == wx.ID_OK:
+            with PickSubnetDlg(self, thread.subnets) as picker:
+                if picker.ShowModal() == wx.ID_OK:
+                    print picker.chosen_subnet
+                    #thread = StartInstanceThread(self, picker.chosen_subnet)
+                    #thread.start()
 
     def OnButton_btnStop(self, evt):
         thread = TerminateInstanceThread(self, self.ctlInstanceId.GetValue())
