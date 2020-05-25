@@ -148,12 +148,6 @@ class DescribeInstancesThread(WaitDlgThread):
         print (ret)
         instances = sorted((instance for reservation in ret["Reservations"] for instance in reservation["Instances"]), key=lambda instance: instance["LaunchTime"])
         print (instances)
-        #TODO do they tag the spot request or just the instances?
-        ret = ec2.describe_spot_instance_requests(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
-        print (ret)
-        ret = ec2.describe_launch_templates(LaunchTemplateIds=[self.settings["launch_template_id"]])
-        print (ret)
-        print (ret["LaunchTemplates"][0]["LaunchTemplateName"])
         if len(instances) > 0:
             instance = instances[-1]
             public_ip = instance.get("PublicIpAddress", "")
