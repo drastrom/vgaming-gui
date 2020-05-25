@@ -308,7 +308,7 @@ def __init_resources():
           </object>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlStatus">
-              <enabled>0</enabled>
+              <style>wxTE_READONLY</style>
               <XRCED>
                 <assign_var>1</assign_var>
               </XRCED>
@@ -323,7 +323,7 @@ def __init_resources():
           </object>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlInstanceId">
-              <enabled>0</enabled>
+              <style>wxTE_READONLY</style>
               <XRCED>
                 <assign_var>1</assign_var>
               </XRCED>
@@ -338,7 +338,7 @@ def __init_resources():
           </object>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlSpotId">
-              <enabled>0</enabled>
+              <style>wxTE_READONLY</style>
               <XRCED>
                 <assign_var>1</assign_var>
               </XRCED>
@@ -353,7 +353,7 @@ def __init_resources():
           </object>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlPublicIP">
-              <enabled>0</enabled>
+              <style>wxTE_READONLY</style>
               <XRCED>
                 <assign_var>1</assign_var>
               </XRCED>
@@ -372,7 +372,7 @@ def __init_resources():
           </object>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="ctlPassword">
-              <enabled>0</enabled>
+              <style>wxTE_READONLY</style>
               <XRCED>
                 <assign_var>1</assign_var>
               </XRCED>
