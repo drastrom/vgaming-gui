@@ -399,8 +399,10 @@ password:s:%s\r
 connect to console:i:1\r
 administrative session:i:1\r
 """ % (self.ctlPublicIP.GetValue(), self.ctlPassword.GetValue()))
-        if sys.platform in ('win32', 'cygwin'):
-            subprocess.Popen(["mstsc", tmpfile])
+        if sys.platform.startswith('win'):
+            os.startfile(tmpfile)
+        elif sys.platform in ('cygwin', 'msys'):
+            subprocess.Popen(["start", tmpfile])
         elif sys.platform == "darwin":
             subprocess.Popen(["open", tmpfile])
         else:
