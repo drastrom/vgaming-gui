@@ -168,6 +168,7 @@ class DescribeInstancesThread(WaitDlgThread):
 class WaitForPasswordThread(ErrorDlgThread):
     def __init__(self, parent, settings, instance_id):
         super(WaitForPasswordThread, self).__init__(parent)
+        self.daemon = True
         self.instance_id = instance_id
         self.settings = settings
 
@@ -212,6 +213,7 @@ class WaitForPasswordThread(ErrorDlgThread):
 class WaitForPublicIPThread(ErrorDlgThread):
     def __init__(self, parent, settings, instance_id):
         super(WaitForPublicIPThread, self).__init__(parent)
+        self.daemon = True
         self.instance_id = instance_id
         self.settings = settings
 
@@ -233,6 +235,7 @@ class WaitForPublicIPThread(ErrorDlgThread):
 class WaitForTerminationThread(ErrorDlgThread):
     def __init__(self, parent, settings, instance_id):
         super(WaitForTerminationThread, self).__init__(parent)
+        self.daemon = True
         self.instance_id = instance_id
         self.settings = settings
 
