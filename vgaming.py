@@ -17,6 +17,11 @@ import vgaming_xrc, wx
 import wx.lib.agw.genericmessagedialog
 
 try:
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
+
+try:
     from typing import final
 except (ImportError, NameError):
     def final(f):
@@ -204,7 +209,7 @@ class WaitForPasswordThread(ErrorDlgThread):
                 raise subprocess.CalledProcessError(x.returncode, "gpg-connect-agent", ret[1])
             for line in ret[0].split("\n"):
                 if line[:2] == "D ":
-                    password = line[2:]
+                    password = unquote(line[2:])
                 elif line[:4] == "ERR ":
                     raise RuntimeError(line[4:])
         wx.CallAfter(self.parent.ctlPassword.SetValue, password)
