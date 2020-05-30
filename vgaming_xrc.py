@@ -628,6 +628,7 @@ def __init_resources():
               <content>
                 <item/>
               </content>
+              <style>wxCB_SORT</style>
               <XRCED>
                 <events>EVT_CHOICE</events>
                 <assign_var>1</assign_var>
