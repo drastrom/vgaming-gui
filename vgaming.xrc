@@ -27,6 +27,7 @@
         <label>&amp;View</label>
         <object class="wxMenuItem" name="itmRefresh">
           <label>&amp;Refresh</label>
+          <bitmap>view-refresh-16.png</bitmap>
           <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
