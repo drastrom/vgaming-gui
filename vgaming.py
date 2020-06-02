@@ -32,9 +32,8 @@ except (ImportError, NameError):
 _ = wx.GetTranslation
 
 # Utility function
-def make_boto3_session(settings):
-        #return boto3.session.Session(aws_access_key_id=self.settings["access_key_id"], aws_secret_access_key=self.settings["secret_access_key"], region_name=self.settings["region"])
-        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key})
+def make_ec2_client(settings):
+        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key}).client('ec2')
 
 
 class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
@@ -147,8 +146,7 @@ class DescribeInstancesThread(WaitDlgThread):
         self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         ret = ec2.describe_instances(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
         print (ret)
         instances = sorted((instance for reservation in ret["Reservations"] for instance in reservation["Instances"]), key=lambda instance: instance["LaunchTime"])
@@ -178,8 +176,7 @@ class WaitForPasswordThread(ErrorDlgThread):
         self.settings = settings
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         waiter = ec2.get_waiter("password_data_available")
         waiter.wait(InstanceId=self.instance_id)
         # stupid waiter only gives you the last result on error, not success
@@ -223,8 +220,7 @@ class WaitForPublicIPThread(ErrorDlgThread):
         self.settings = settings
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         waiter = ec2.get_waiter("instance_running")
         waiter.wait(InstanceIds=[self.instance_id])
         # stupid waiter only gives you the last result on error, not success
@@ -245,8 +241,7 @@ class WaitForTerminationThread(ErrorDlgThread):
         self.settings = settings
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         waiter = ec2.get_waiter("instance_terminated")
         waiter.wait(InstanceIds=[self.instance_id])
         # stupid waiter only gives you the last result on error, not success
@@ -263,8 +258,7 @@ class StartInstanceThread(WaitDlgThread):
         self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         ret = ec2.run_instances(MinCount=1, MaxCount=1, LaunchTemplate={"LaunchTemplateId": self.settings["launch_template_id"]}, NetworkInterfaces=[{"DeviceIndex": 0, "SubnetId": self.subnet_id}])
         instance = ret["Instances"][0]
         instance_id = instance["InstanceId"]
@@ -287,8 +281,7 @@ class TerminateInstanceThread(WaitDlgThread):
         self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         ret = ec2.cancel_spot_instance_requests(SpotInstanceRequestIds=[self.spot_instance_request_id])
         print (ret)
         ret = ec2.terminate_instances(InstanceIds=[self.instance_id])
@@ -305,8 +298,7 @@ class DescribeSubnetsThread(WaitDlgThread):
         self.settings = deepcopy(wx.GetApp().settings)
 
     def process(self):
-        session = make_boto3_session(self.settings)
-        ec2 = session.client('ec2')
+        ec2 = make_ec2_client(self.settings)
         ret = ec2.describe_subnets(Filters=[{"Name": "state", "Values": ["available"]}])
         self.subnets = {subnet["SubnetId"]: "%s (%s)" % (next((tag["Value"] for tag in subnet["Tags"] if tag["Key"] == "Name"), ""), subnet["AvailabilityZone"]) for subnet in ret["Subnets"]}
         print (self.subnets)
