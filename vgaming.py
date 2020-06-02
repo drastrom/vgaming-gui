@@ -2,7 +2,7 @@
 
 import atexit
 import base64
-import boto3, botocore
+import botocore.session
 from copy import deepcopy
 import itertools
 import json
@@ -33,7 +33,7 @@ _ = wx.GetTranslation
 
 # Utility function
 def make_ec2_client(settings):
-        return boto3.session.Session(region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key}).client('ec2')
+    return botocore.session.get_session().create_client('ec2', region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key})
 
 
 class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
