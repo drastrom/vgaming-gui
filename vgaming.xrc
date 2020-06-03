@@ -170,6 +170,7 @@
       </object>
     </object>
     <title>vGaming</title>
+    <icon>drake_molecule.ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
   </object>
   <object class="wxDialog" name="dlgSettings">
@@ -322,6 +323,7 @@
       </object>
     </object>
     <title>Settings</title>
+    <icon>drake_molecule.ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
     <XRCED>
       <events>EVT_INIT_DIALOG</events>
@@ -351,6 +353,7 @@
     </object>
     <title>Please wait...</title>
     <centered>1</centered>
+    <icon>drake_molecule.ico</icon>
     <style>wxCLIP_CHILDREN|wxCAPTION|wxSTAY_ON_TOP|wxSYSTEM_MENU</style>
     <XRCED>
       <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
@@ -410,6 +413,7 @@
     </object>
     <title>Select a subnet</title>
     <centered>1</centered>
+    <icon>drake_molecule.ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
     <XRCED>
       <events>EVT_INIT_DIALOG</events>
