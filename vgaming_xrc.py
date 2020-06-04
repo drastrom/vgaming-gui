@@ -289,7 +289,7 @@ def __init_resources():
         <label>&amp;View</label>
         <object class="wxMenuItem" name="itmRefresh">
           <label>&amp;Refresh</label>
-          <bitmap>view_refresh_16_png</bitmap>
+	  <bitmap>resources_view_refresh_16_png</bitmap>
           <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
@@ -432,7 +432,7 @@ def __init_resources():
       </object>
     </object>
     <title>vGaming</title>
-    <icon>drake_molecule_ico</icon>
+    <icon>resources_drake_molecule_ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
   </object>
   <object class="wxDialog" name="dlgSettings">
@@ -585,7 +585,7 @@ def __init_resources():
       </object>
     </object>
     <title>Settings</title>
-    <icon>drake_molecule_ico</icon>
+    <icon>resources_drake_molecule_ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
     <XRCED>
       <events>EVT_INIT_DIALOG</events>
@@ -615,7 +615,7 @@ def __init_resources():
     </object>
     <title>Please wait...</title>
     <centered>1</centered>
-    <icon>drake_molecule_ico</icon>
+    <icon>resources_drake_molecule_ico</icon>
     <style>wxCLIP_CHILDREN|wxCAPTION|wxSTAY_ON_TOP|wxSYSTEM_MENU</style>
     <XRCED>
       <events>EVT_INIT_DIALOG|EVT_CLOSE|EVT_WINDOW_DESTROY</events>
@@ -675,7 +675,7 @@ def __init_resources():
     </object>
     <title>Select a subnet</title>
     <centered>1</centered>
-    <icon>drake_molecule_ico</icon>
+    <icon>resources_drake_molecule_ico</icon>
     <style>wxCLIP_CHILDREN|wxDEFAULT_DIALOG_STYLE</style>
     <XRCED>
       <events>EVT_INIT_DIALOG</events>
@@ -683,7 +683,7 @@ def __init_resources():
   </object>
 </resource>'''
 
-    view_refresh_16_png = '''\
+    resources_view_refresh_16_png = '''\
 \x89PNG\x0d
 \x1a
 \x00\x00\x00\x0dIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\x00\x00\x00\
@@ -725,7 +725,7 @@ u\x04\x00\x96\x1fI1M\xe4\xe6N\xdf<\xb9-\xf9\xa0\xb0\xf0I\xff\xf77\xe6\x8f\
 R\xc5\x0d]\x9b!\xc2P\xd5\x91\x87l\xcb\xfc\xdb\x0f\xf7.Uvj\x13e\xcc\xc6\
 \x00\x00\x00\x00IEND\xaeB`\x82'''
 
-    drake_molecule_ico = '''\
+    resources_drake_molecule_ico = '''\
 \x00\x00\x01\x00\x05\x00\x00\x00\x00\x00\x01\x00 \x00xW\x01\x00V\x00\x00\
 \x00@@\x00\x00\x01\x00 \x00(B\x00\x00\xceW\x01\x0000\x00\x00\x01\x00 \x00\
 \xa8%\x00\x00\xf6\x99\x01\x00  \x00\x00\x01\x00 \x00\xa8\x10\x00\x00\x9e\
@@ -5886,8 +5886,8 @@ fff\x05\x06\xf2\xf2\xf2\x14<<<j:::qjjj0\xaa\xaa\xaa\x06\x04\x02\
 \x00\x00\x80\x00\x00\x00\x80\x00\x00\x00\x80\x00\x00\x00\xf7\x03\x00\x00'''
 
     wx.MemoryFSHandler.AddFile('XRC/vgaming/vgaming_xrc', vgaming_xrc)
-    wx.MemoryFSHandler.AddFile('XRC/vgaming/view_refresh_16_png', view_refresh_16_png)
-    wx.MemoryFSHandler.AddFile('XRC/vgaming/drake_molecule_ico', drake_molecule_ico)
+    wx.MemoryFSHandler.AddFile('XRC/vgaming/resources_view_refresh_16_png', resources_view_refresh_16_png)
+    wx.MemoryFSHandler.AddFile('XRC/vgaming/resources_drake_molecule_ico', resources_drake_molecule_ico)
     __res.Load('memory:XRC/vgaming/vgaming_xrc')
 
 
