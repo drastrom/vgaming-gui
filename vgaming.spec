@@ -30,4 +30,8 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True , manifest='manifest.xml', icon='drake_molecule.ico')
+          console=False , manifest='manifest.xml', icon='drake_molecule.ico')
+app = BUNDLE(exe,
+             name='vgaming.app',
+             icon='drake_molecule.icns',
+             bundle_identifier=None)
