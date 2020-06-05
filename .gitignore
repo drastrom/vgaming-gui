@@ -1,4 +1,5 @@
 *.py[co]
+*_xrc.py
 config.json
 .vscode
 build
