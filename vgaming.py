@@ -190,7 +190,7 @@ class WaitForPasswordThread(ErrorDlgThread):
             extra_popen_args['startupinfo'] = subprocess.STARTUPINFO()
             extra_popen_args['startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
             extra_popen_args['startupinfo'].wShowWindow = subprocess.SW_HIDE
-        except NameError:
+        except (NameError, AttributeError):
             pass
 
         if self.settings["decryption_type"] == 0:
