@@ -4,6 +4,10 @@
 import time
 import sys
 
+import PyInstaller.utils.hooks
+PyInstaller.utils.hooks.PY_IGNORE_EXTENSIONS.add(".pyc")
+PyInstaller.utils.hooks.PY_IGNORE_EXTENSIONS.add(".pyo")
+
 block_cipher = None
 
 DEBUG = False
