@@ -146,6 +146,35 @@ class WaitDlgThread(ErrorDlgThread):
         super(WaitDlgThread, self).on_error()
 
 
+class SingletonWaiterThread(ErrorDlgThread):
+    singleton_instance = None
+
+    def __init__(self, parent, settings, instance_id):
+        super(SingletonWaiterThread, self).__init__(parent)
+        self.daemon = True
+        self.settings = settings
+        self.instance_id = instance_id
+
+    @classmethod
+    def ensure_started(cls, parent, settings, instance_id):
+        if cls.singleton_instance is None or not cls.singleton_instance.is_alive:
+            cls.singleton_instance = cls(parent, settings, instance_id)
+            cls.singleton_instance.start()
+            print "Started", cls.singleton_instance
+        elif cls.singleton_instance.instance_id != instance_id:
+            raise RuntimeError("Already-running thread has different "
+                "instance_id %s than we were called with (%s)" %
+                (cls.singleton_instance.instance_id, instance_id))
+        else:
+            print "Already running", cls.singleton_instance
+
+        return cls.singleton_instance
+
+    def on_complete(self):
+        type(self).singleton_instance = None
+        super(SingletonWaiterThread, self).on_complete()
+
+
 class DescribeInstancesThread(WaitDlgThread):
     def __init__(self, parent):
         super(DescribeInstancesThread, self).__init__(parent)
@@ -165,8 +194,8 @@ class DescribeInstancesThread(WaitDlgThread):
             wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
             if instance["State"]["Name"] not in ("shutting-down", "terminated", "stopping", "stopped"):
                 if public_ip == "":
-                    WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
-                WaitForPasswordThread(self.parent, self.settings, instance_id).start()
+                    WaitForPublicIPThread.ensure_started(self.parent, self.settings, instance_id)
+                WaitForPasswordThread.ensure_started(self.parent, self.settings, instance_id)
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id, public_ip):
         parent.ctlStatus.SetValue(state)
@@ -175,12 +204,9 @@ class DescribeInstancesThread(WaitDlgThread):
         parent.ctlPublicIP.SetValue(public_ip)
 
 
-class WaitForPasswordThread(ErrorDlgThread):
+class WaitForPasswordThread(SingletonWaiterThread):
     def __init__(self, parent, settings, instance_id):
-        super(WaitForPasswordThread, self).__init__(parent)
-        self.daemon = True
-        self.instance_id = instance_id
-        self.settings = settings
+        super(WaitForPasswordThread, self).__init__(parent, settings, instance_id)
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -230,12 +256,9 @@ class WaitForPasswordThread(ErrorDlgThread):
         wx.CallAfter(self.parent.ctlPassword.SetValue, password)
 
 
-class WaitForPublicIPThread(ErrorDlgThread):
+class WaitForPublicIPThread(SingletonWaiterThread):
     def __init__(self, parent, settings, instance_id):
-        super(WaitForPublicIPThread, self).__init__(parent)
-        self.daemon = True
-        self.instance_id = instance_id
-        self.settings = settings
+        super(WaitForPublicIPThread, self).__init__(parent, settings, instance_id)
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -251,12 +274,9 @@ class WaitForPublicIPThread(ErrorDlgThread):
         parent.ctlPublicIP.SetValue(public_ip)
 
 
-class WaitForTerminationThread(ErrorDlgThread):
+class WaitForTerminationThread(SingletonWaiterThread):
     def __init__(self, parent, settings, instance_id):
-        super(WaitForTerminationThread, self).__init__(parent)
-        self.daemon = True
-        self.instance_id = instance_id
-        self.settings = settings
+        super(WaitForTerminationThread, self).__init__(parent, settings, instance_id)
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -281,8 +301,8 @@ class StartInstanceThread(WaitDlgThread):
         instance = ret["Instances"][0]
         instance_id = instance["InstanceId"]
         wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"])
-        WaitForPublicIPThread(self.parent, self.settings, instance_id).start()
-        WaitForPasswordThread(self.parent, self.settings, instance_id).start()
+        WaitForPublicIPThread.ensure_started(self.parent, self.settings, instance_id)
+        WaitForPasswordThread.ensure_started(self.parent, self.settings, instance_id)
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id):
         parent.ctlStatus.SetValue(state)
@@ -306,7 +326,7 @@ class TerminateInstanceThread(WaitDlgThread):
         print (ret)
         instance = ret["TerminatingInstances"][0]
         wx.CallAfter(self.parent.ctlStatus.SetValue, instance["CurrentState"]["Name"])
-        WaitForTerminationThread(self.parent, self.settings, self.instance_id).start()
+        WaitForTerminationThread.ensure_started(self.parent, self.settings, self.instance_id)
 
 
 class DescribeSubnetsThread(WaitDlgThread):
