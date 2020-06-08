@@ -79,18 +79,23 @@ class BaseThread(threading.Thread):
         try:
             self.pre_process()
             self.process()
-            self.on_complete()
+            self.on_success()
         except:
             self.on_error()
             raise
+        finally:
+            self.on_complete()
 
     def pre_process(self):
         pass
 
-    def on_complete(self):
+    def on_success(self):
         pass
 
     def on_error(self):
+        pass
+
+    def on_complete(self):
         pass
 
     def process(self):
@@ -103,13 +108,15 @@ class ErrorDlgThread(BaseThread):
         super(ErrorDlgThread, self).__init__(**kwargs)
         self.parent = parent
 
-    def on_complete(self):
+    def on_success(self):
         del self.parent
+        super(ErrorDlgThread, self).on_success()
 
     def on_error(self):
         exc_message = _("Exception in thread %s") % (self.name,)
         exc_string = format_exc()
         wx.CallAfter(self._show_error, exc_message, exc_string)
+        super(ErrorDlgThread, self).on_error()
 
     def _show_error(self, exc_message, exc_string):
         with GenericMessageDialog(self.parent, exc_message, _("An error occurred"), wx.OK|wx.ICON_ERROR) as errdlg:
@@ -130,9 +137,9 @@ class WaitDlgThread(ErrorDlgThread):
         self.join()
         return ret
 
-    def on_complete(self):
+    def on_success(self):
         wx.CallAfter(self.dlg.EndModal, wx.ID_OK)
-        super(WaitDlgThread, self).on_complete()
+        super(WaitDlgThread, self).on_success()
 
     def on_error(self):
         wx.CallAfter(self.dlg.EndModal, wx.ID_ABORT)
