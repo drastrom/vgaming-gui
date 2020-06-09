@@ -206,6 +206,11 @@ class DescribeInstancesThread(WaitDlgThread):
         print (ret)
         instances = sorted((instance for reservation in ret["Reservations"] for instance in reservation["Instances"]), key=lambda instance: instance["LaunchTime"])
         print (instances)
+        # sanity check
+        for instance in instances[:-1]:
+            if instance["State"]["Name"] != "terminated":
+                raise RuntimeError("Old instance(s) seem to still exist.  Better sort this out manually!")
+
         if len(instances) > 0:
             instance = instances[-1]
             public_ip = instance.get("PublicIpAddress", "")
