@@ -103,6 +103,39 @@ class BaseThread(threading.Thread):
         super(BaseThread, self).run()
 
 
+class SingletonThread(BaseThread):
+    singleton_instance = None
+
+    def __init__(self, **kwargs):
+        super(SingletonThread, self).__init__(**kwargs)
+        self.daemon = True
+
+    def is_equivalent(self, *args, **kwargs):
+        return False
+
+    def raise_non_equivalence(self, *args, **kwargs):
+        raise RuntimeError("Already-running thread is not equivalent to "
+                           "thread we were asked to ensure was started")
+
+    @classmethod
+    def ensure_started(cls, *args, **kwargs):
+        if (cls.singleton_instance is None or
+            not cls.singleton_instance.is_alive):
+            cls.singleton_instance = cls(*args, **kwargs)
+            cls.singleton_instance.start()
+            print "Started", cls.singleton_instance
+        elif not cls.singleton_instance.is_equivalent(*args, **kwargs):
+            cls.singleton_instance.raise_non_equivalence(*args, **kwargs)
+        else:
+            print "Already running", cls.singleton_instance
+
+        return cls.singleton_instance
+
+    def on_complete(self):
+        type(self).singleton_instance = None
+        super(SingletonThread, self).on_complete()
+
+
 class ErrorDlgThread(BaseThread):
     def __init__(self, parent, **kwargs):
         super(ErrorDlgThread, self).__init__(**kwargs)
@@ -146,33 +179,19 @@ class WaitDlgThread(ErrorDlgThread):
         super(WaitDlgThread, self).on_error()
 
 
-class SingletonWaiterThread(ErrorDlgThread):
-    singleton_instance = None
-
+class SingletonWaiterThread(ErrorDlgThread, SingletonThread):
     def __init__(self, parent, settings, instance_id):
         super(SingletonWaiterThread, self).__init__(parent)
-        self.daemon = True
         self.settings = settings
         self.instance_id = instance_id
 
-    @classmethod
-    def ensure_started(cls, parent, settings, instance_id):
-        if cls.singleton_instance is None or not cls.singleton_instance.is_alive:
-            cls.singleton_instance = cls(parent, settings, instance_id)
-            cls.singleton_instance.start()
-            print "Started", cls.singleton_instance
-        elif cls.singleton_instance.instance_id != instance_id:
-            raise RuntimeError("Already-running thread has different "
+    def is_equivalent(self, parent, settings, instance_id):
+        return self.instance_id == instance_id
+
+    def raise_non_equivalence(self, parent, settings, instance_id):
+        raise RuntimeError("Already-running thread has different "
                 "instance_id %s than we were called with (%s)" %
-                (cls.singleton_instance.instance_id, instance_id))
-        else:
-            print "Already running", cls.singleton_instance
-
-        return cls.singleton_instance
-
-    def on_complete(self):
-        type(self).singleton_instance = None
-        super(SingletonWaiterThread, self).on_complete()
+                (self.instance_id, instance_id))
 
 
 class DescribeInstancesThread(WaitDlgThread):
