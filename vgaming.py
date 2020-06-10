@@ -104,7 +104,20 @@ class BaseThread(threading.Thread):
 
 
 class SingletonThread(BaseThread):
-    singleton_instance = None
+    _singleton_instance = None
+    _lock = None
+    # this lock is shared by all SingletonThread instances
+    _meta_lock = threading.Lock()
+
+    @classmethod
+    def _get_lock(cls):
+        if cls._lock is not None:
+            return cls._lock
+        else:
+            with cls._meta_lock:
+                if cls._lock is None:
+                    cls._lock = threading.Lock()
+                return cls._lock
 
     def __init__(self, **kwargs):
         super(SingletonThread, self).__init__(**kwargs)
@@ -119,20 +132,23 @@ class SingletonThread(BaseThread):
 
     @classmethod
     def ensure_started(cls, *args, **kwargs):
-        if (cls.singleton_instance is None or
-            not cls.singleton_instance.is_alive):
-            cls.singleton_instance = cls(*args, **kwargs)
-            cls.singleton_instance.start()
-            print "Started", cls.singleton_instance
-        elif not cls.singleton_instance.is_equivalent(*args, **kwargs):
-            cls.singleton_instance.raise_non_equivalence(*args, **kwargs)
-        else:
-            print "Already running", cls.singleton_instance
+        with cls._get_lock():
+            if (cls._singleton_instance is None or
+                not cls._singleton_instance.is_alive):
+                cls._singleton_instance = cls(*args, **kwargs)
+                cls._singleton_instance.start()
+                print "Started", cls._singleton_instance
+            elif not cls._singleton_instance.is_equivalent(*args, **kwargs):
+                cls._singleton_instance.raise_non_equivalence(*args, **kwargs)
+            else:
+                print "Already running", cls._singleton_instance
 
-        return cls.singleton_instance
+            return cls._singleton_instance
 
     def on_complete(self):
-        type(self).singleton_instance = None
+        cls = type(self)
+        with cls._get_lock():
+            cls._singleton_instance = None
         super(SingletonThread, self).on_complete()
 
 
