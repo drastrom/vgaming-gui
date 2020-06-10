@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import atexit
 import base64
 import botocore.session
@@ -16,6 +18,7 @@ from traceback import format_exc
 import vgaming_xrc, wx
 import wx.lib.agw.genericmessagedialog
 
+# Python3 compat fallbacks
 try:
     from urllib.parse import unquote
 except ImportError:
@@ -29,11 +32,21 @@ except (ImportError, NameError):
         type checker, not actually doing anything at runtime. """
         return f
 
+try:
+    iteritems = dict.iteritems
+except AttributeError:
+    iteritems = dict.items
+
+try:
+    izip = itertools.izip
+except AttributeError:
+    izip = zip
+
 _ = wx.GetTranslation
 
 # Utility function
 def make_ec2_client(settings):
-    return botocore.session.get_session().create_client('ec2', region_name=settings["region"], **{'aws_'+key: value for key,value in settings.iteritems() if 'access_key' in key})
+    return botocore.session.get_session().create_client('ec2', region_name=settings["region"], **{'aws_'+key: value for key,value in iteritems(settings) if 'access_key' in key})
 
 
 class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog):
@@ -137,11 +150,11 @@ class SingletonThread(BaseThread):
                 not cls._singleton_instance.is_alive):
                 cls._singleton_instance = cls(*args, **kwargs)
                 cls._singleton_instance.start()
-                print "Started", cls._singleton_instance
+                print("Started", cls._singleton_instance)
             elif not cls._singleton_instance.is_equivalent(*args, **kwargs):
                 cls._singleton_instance.raise_non_equivalence(*args, **kwargs)
             else:
-                print "Already running", cls._singleton_instance
+                print("Already running", cls._singleton_instance)
 
             return cls._singleton_instance
 
@@ -219,9 +232,9 @@ class DescribeInstancesThread(WaitDlgThread):
     def process(self):
         ec2 = make_ec2_client(self.settings)
         ret = ec2.describe_instances(Filters=[{'Name': 'tag:aws:ec2launchtemplate:id', 'Values': [self.settings["launch_template_id"]]}])
-        print (ret)
+        print(ret)
         instances = sorted((instance for reservation in ret["Reservations"] for instance in reservation["Instances"]), key=lambda instance: instance["LaunchTime"])
-        print (instances)
+        print(instances)
         # sanity check
         for instance in instances[:-1]:
             if instance["State"]["Name"] != "terminated":
@@ -269,7 +282,7 @@ class WaitForPasswordThread(SingletonWaiterThread):
         if self.settings["decryption_type"] == 0:
             x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **extra_popen_args)
             ret = x.communicate(pwdata)
-            print ret, x.returncode
+            print(ret, x.returncode)
             if x.returncode != 0:
                 raise subprocess.CalledProcessError(x.returncode, "openssl", ret[1])
             password = ret[0]
@@ -278,14 +291,14 @@ class WaitForPasswordThread(SingletonWaiterThread):
             env["OPENSC_DRIVER"] = "openpgp"
             x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-keyform", "ENGINE", "-engine", "pkcs11", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **extra_popen_args)
             ret = x.communicate(pwdata)
-            print ret, x.returncode
+            print(ret, x.returncode)
             if x.returncode != 0:
                 raise subprocess.CalledProcessError(x.returncode, "openssl", ret[1])
             password = ret[0]
         elif self.settings["decryption_type"] == 2:
             x = subprocess.Popen(["gpg-connect-agent", 'SCD SETDATA ' + base64.b16encode(pwdata), 'SCD PKDECRYPT ' + self.settings["decryption_key_file_uri"], '/bye'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, **extra_popen_args)
             ret = x.communicate()
-            print ret, x.returncode
+            print(ret, x.returncode)
             if x.returncode != 0:
                 raise subprocess.CalledProcessError(x.returncode, "gpg-connect-agent", ret[1])
             for line in ret[0].split("\n"):
@@ -361,9 +374,9 @@ class TerminateInstanceThread(WaitDlgThread):
     def process(self):
         ec2 = make_ec2_client(self.settings)
         ret = ec2.cancel_spot_instance_requests(SpotInstanceRequestIds=[self.spot_instance_request_id])
-        print (ret)
+        print(ret)
         ret = ec2.terminate_instances(InstanceIds=[self.instance_id])
-        print (ret)
+        print(ret)
         instance = ret["TerminatingInstances"][0]
         wx.CallAfter(self.parent.ctlStatus.SetValue, instance["CurrentState"]["Name"])
         WaitForTerminationThread.ensure_started(self.parent, self.settings, self.instance_id)
@@ -379,7 +392,7 @@ class DescribeSubnetsThread(WaitDlgThread):
         ec2 = make_ec2_client(self.settings)
         ret = ec2.describe_subnets(Filters=[{"Name": "state", "Values": ["available"]}])
         self.subnets = {subnet["SubnetId"]: "%s (%s)" % (next((tag["Value"] for tag in subnet["Tags"] if tag["Key"] == "Name"), ""), subnet["AvailabilityZone"]) for subnet in ret["Subnets"]}
-        print (self.subnets)
+        print(self.subnets)
 
 
 class PickSubnetDlg(vgaming_xrc.xrcdlgSubnetPicker):
@@ -389,7 +402,7 @@ class PickSubnetDlg(vgaming_xrc.xrcdlgSubnetPicker):
 
     def OnInit_dialog(self, evt):
         self.choiceSubnet.Clear()
-        for subnet_id, subnet_name in self.subnets.iteritems():
+        for subnet_id, subnet_name in iteritems(self.subnets):
             self.choiceSubnet.Append(subnet_name, subnet_id)
 
     def OnChoice_choiceSubnet(self, evt):
@@ -428,24 +441,24 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         settings["secret_access_key"] = self.ctlSecret.GetValue()
         settings["launch_template_id"] = self.ctlLaunchTemplate.GetValue()
         settings["decryption_key_file_uri"] = self.ctlKeyFileURI.GetValue()
-        for i, radio in itertools.izip(itertools.count(), self.decryptionTypeRadios):
+        for i, radio in izip(itertools.count(), self.decryptionTypeRadios):
             if radio.GetValue():
                 settings["decryption_type"] = i
                 break
         app.SaveSettings(settings)
 
     def OnButton_wxID_OK(self, evt):
-        print "cool"
+        print("cool")
         self.Save()
         self.EndModal(wx.ID_OK)
 
     def OnButton_wxID_CANCEL(self, evt):
-        print "darn"
+        print("darn")
         # TODO if not saved, ask if they're sure
         self.EndModal(wx.ID_CANCEL)
 
     def OnButton_wxID_APPLY(self, evt):
-        print "apply"
+        print("apply")
         self.Save()
 
 
@@ -460,7 +473,7 @@ class MainFrame(vgaming_xrc.xrcmainframe):
         if thread.start() == wx.ID_OK:
             with PickSubnetDlg(self, thread.subnets) as picker:
                 if picker.ShowModal() == wx.ID_OK:
-                    print picker.chosen_subnet
+                    print(picker.chosen_subnet)
                     thread = StartInstanceThread(self, picker.chosen_subnet)
                     thread.start()
 
