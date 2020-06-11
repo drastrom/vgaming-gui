@@ -165,7 +165,7 @@
           </object>
           <orient>wxHORIZONTAL</orient>
         </object>
-        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTRE|wxALIGN_BOTTOM</flag>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTRE</flag>
         <border>7</border>
       </object>
     </object>
