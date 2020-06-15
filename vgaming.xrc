@@ -407,7 +407,7 @@
             </object>
           </object>
         </object>
-        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTRE</flag>
         <border>7</border>
       </object>
     </object>
