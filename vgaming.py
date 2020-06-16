@@ -141,13 +141,13 @@ class SingletonThread(BaseThread):
 
     def raise_non_equivalence(self, *args, **kwargs):
         raise RuntimeError(_("Already-running thread is not equivalent to "
-                           "thread we were asked to ensure was started"))
+                             "thread we were asked to ensure was started"))
 
     @classmethod
     def ensure_started(cls, *args, **kwargs):
         with cls._get_lock():
             if (cls._singleton_instance is None or
-                not cls._singleton_instance.is_alive):
+                    not cls._singleton_instance.is_alive):
                 cls._singleton_instance = cls(*args, **kwargs)
                 cls._singleton_instance.start()
                 print("Started", cls._singleton_instance)
@@ -219,8 +219,8 @@ class SingletonWaiterThread(ErrorDlgThread, SingletonThread):
 
     def raise_non_equivalence(self, parent, settings, instance_id):
         raise RuntimeError(_("Already-running thread has different "
-                "instance_id %s than we were called with (%s)") %
-                (self.instance_id, instance_id))
+                             "instance_id %s than we were called with (%s)") %
+                           (self.instance_id, instance_id))
 
 
 class DescribeInstancesThread(WaitDlgThread):
