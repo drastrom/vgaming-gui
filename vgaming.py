@@ -6,7 +6,6 @@ import atexit
 import base64
 import botocore.session
 from copy import deepcopy
-import itertools
 import json
 import os
 import subprocess
@@ -36,11 +35,6 @@ try:
     iteritems = dict.iteritems
 except AttributeError:
     iteritems = dict.items
-
-try:
-    izip = itertools.izip
-except AttributeError:
-    izip = zip
 
 _ = wx.GetTranslation
 
@@ -441,7 +435,7 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         settings["secret_access_key"] = self.ctlSecret.GetValue()
         settings["launch_template_id"] = self.ctlLaunchTemplate.GetValue()
         settings["decryption_key_file_uri"] = self.ctlKeyFileURI.GetValue()
-        for i, radio in izip(itertools.count(), self.decryptionTypeRadios):
+        for i, radio in enumerate(self.decryptionTypeRadios):
             if radio.GetValue():
                 settings["decryption_type"] = i
                 break
