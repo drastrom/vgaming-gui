@@ -5,6 +5,8 @@
       <object class="wxMenu" name="wxID_FILE" platform="win|unix">
         <label>&amp;File</label>
         <object class="wxMenuItem" name="wxID_EXIT">
+          <label>E&amp;xit</label>
+          <bitmap stock_id="wxART_QUIT"/>
           <accel platform="win">Alt-F4</accel>
           <XRCED>
             <events>EVT_MENU</events>
@@ -14,6 +16,8 @@
       <object class="wxMenu" name="wxID_EDIT">
         <label>&amp;Edit</label>
         <object class="wxMenuItem" name="wxID_PREFERENCES">
+          <label>&amp;Preferences...</label>
+          <bitmap stock_id="wxART_HELP_SETTINGS"/>
           <accel platform="win|unix">Ctrl-E</accel>
           <XRCED>
             <events>EVT_MENU</events>
@@ -25,6 +29,8 @@
       <object class="wxMenu" name="mnuView">
         <label>&amp;View</label>
         <object class="wxMenuItem" name="wxID_REFRESH">
+          <label>&amp;Refresh</label>
+          <bitmap>resources/view-refresh-16.png</bitmap>
           <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
