@@ -5,6 +5,7 @@
       <object class="wxMenu" name="wxID_FILE" platform="win|unix">
         <label>&amp;File</label>
         <object class="wxMenuItem" name="wxID_EXIT">
+          <accel platform="win">Alt-F4</accel>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
@@ -13,7 +14,7 @@
       <object class="wxMenu" name="wxID_EDIT">
         <label>&amp;Edit</label>
         <object class="wxMenuItem" name="wxID_PREFERENCES">
-          <accel>Ctrl-E</accel>
+          <accel platform="win|unix">Ctrl-E</accel>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
