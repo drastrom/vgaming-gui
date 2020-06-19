@@ -1,33 +1,29 @@
-<?xml version="1.0" ?>
-<resource class="wxBoxSizer">
+<?xml version="1.0" encoding="UTF-8"?>
+<resource class="wxMenuItem">
   <object class="wxFrame" name="mainframe">
     <object class="wxMenuBar" name="menuBar">
-      <object class="wxMenu" name="mnuFile">
+      <object class="wxMenu" name="wxID_FILE" platform="win|unix">
+        <label>&amp;File</label>
         <object class="wxMenuItem" name="wxID_EXIT">
-          <label>E&amp;xit</label>
-          <bitmap stock_id="wxART_QUIT"/>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
         </object>
-        <label>&amp;File</label>
       </object>
-      <object class="wxMenu" name="mnuEdit">
+      <object class="wxMenu" name="wxID_EDIT">
         <label>&amp;Edit</label>
-        <object class="wxMenuItem" name="itmSettings">
-          <label>&amp;Settings...</label>
-          <bitmap stock_id="wxART_HELP_SETTINGS"/>
+        <object class="wxMenuItem" name="wxID_PREFERENCES">
           <accel>Ctrl-E</accel>
           <XRCED>
             <events>EVT_MENU</events>
           </XRCED>
         </object>
+        <!-- Mac SUCKS - work around its stupidity -->
+        <object class="wxMenuItem" name="wxID_EXIT" platform="mac"/>
       </object>
       <object class="wxMenu" name="mnuView">
         <label>&amp;View</label>
-        <object class="wxMenuItem" name="itmRefresh">
-          <label>&amp;Refresh</label>
-          <bitmap>resources/view-refresh-16.png</bitmap>
+        <object class="wxMenuItem" name="wxID_REFRESH">
           <accel>F5</accel>
           <XRCED>
             <events>EVT_MENU</events>
@@ -294,7 +290,6 @@
         <object class="wxStdDialogButtonSizer">
           <object class="button">
             <object class="wxButton" name="wxID_OK">
-              <label>&amp;OK</label>
               <default>1</default>
               <XRCED>
                 <events>EVT_BUTTON</events>
@@ -303,7 +298,6 @@
           </object>
           <object class="button">
             <object class="wxButton" name="wxID_CANCEL">
-              <label>&amp;Cancel</label>
               <XRCED>
                 <events>EVT_BUTTON</events>
               </XRCED>
@@ -311,7 +305,6 @@
           </object>
           <object class="button">
             <object class="wxButton" name="wxID_APPLY">
-              <label>&amp;Apply</label>
               <XRCED>
                 <events>EVT_BUTTON</events>
               </XRCED>
@@ -389,7 +382,6 @@
         <object class="wxStdDialogButtonSizer">
           <object class="button">
             <object class="wxButton" name="wxID_OK">
-              <label>&amp;OK</label>
               <default>1</default>
               <enabled>0</enabled>
               <XRCED>
@@ -400,7 +392,6 @@
           </object>
           <object class="button">
             <object class="wxButton" name="wxID_CANCEL">
-              <label>&amp;Cancel</label>
               <XRCED>
                 <events>EVT_BUTTON</events>
               </XRCED>

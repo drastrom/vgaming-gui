@@ -511,11 +511,11 @@ password=%s
     def OnMenu_wxID_EXIT(self, evt):
         self.Close()
 
-    def OnMenu_itmSettings(self, evt):
+    def OnMenu_wxID_PREFERENCES(self, evt):
         with SettingsDlg(self) as dlg:
             dlg.ShowModal()
 
-    def OnMenu_itmRefresh(self, evt):
+    def OnMenu_wxID_REFRESH(self, evt):
         self.Refresh()
 
     def Refresh(self):

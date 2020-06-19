@@ -1,10 +1,6 @@
 
 # Resources
 
-## view-refresh-16.png
-
-This file is from the Tango Desktop Project.
-
 ## Git LFS
 
 The GIMP "source" .xcf file is stored in Git LFS.  You only need to retrieve it
