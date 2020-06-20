@@ -16,7 +16,7 @@
       <object class="wxMenu" name="wxID_EDIT">
         <label>&amp;Edit</label>
         <object class="wxMenuItem" name="wxID_PREFERENCES">
-          <label>&amp;Preferences...</label>
+          <label platform="win|unix">&amp;Preferences...</label>
           <bitmap stock_id="wxART_HELP_SETTINGS"/>
           <accel platform="win|unix">Ctrl-E</accel>
           <XRCED>
