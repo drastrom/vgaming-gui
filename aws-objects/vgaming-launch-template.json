@@ -3,20 +3,11 @@
         {
             "LaunchTemplateId": "lt-%LAUNCHTEMPLATE%", 
             "LaunchTemplateName": "vGaming", 
-            "VersionNumber": 13, 
+            "VersionNumber": 14, 
             "CreatedBy": "arn:aws:iam::%ACCOUNTID%:root", 
             "LaunchTemplateData": {
-                "UserData": "PHBvd2Vyc2hlbGw+CkFkZC1XaW5kb3dzQ2FwYWJpbGl0eSAtT25saW5lIC1OYW1lIE9wZW5TU0guU2VydmVyfn5+fjAuMC4xLjAKU2V0LVNlcnZpY2Ugc3NoZCAtU3RhcnR1cFR5cGUgQXV0b21hdGljCiYgIiRFbnY6QUxMVVNFUlNQUk9GSUxFXEFtYXpvblxFQzItV2luZG93c1xMYXVuY2hcU2NyaXB0c1xJbml0aWFsaXplRGlza3MucHMxIiAtU2NoZWR1bGUKSW52b2tlLVdlYnJlcXVlc3QgLVVyaSAiaHR0cHM6Ly9kMXVqNnF0Ym1oM2R0NS5jbG91ZGZyb250Lm5ldC8yMDIwLjAvU2VydmVycy9uaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIiAtT3V0ZmlsZSAiJEhvbWVcRGVza3RvcFxuaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIgptc2lleGVjLmV4ZSAvaSAiJEhvbWVcRGVza3RvcFxuaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIiAvcXVpZXQgL25vcmVzdGFydCAvbCp2IGRjdl9pbnN0YWxsX21zaS5sb2cgQURETE9DQUw9YWxsCiRyZWdwYXRoID0gIlJlZ2lzdHJ5OjpIS0VZX1VTRVJTXFMtMS01LTE4XFNvZnR3YXJlXEdTZXR0aW5nc1xjb21cbmljZXNvZnR3YXJlXGRjdlxzZXNzaW9uLW1hbmFnZW1lbnRcYXV0b21hdGljLWNvbnNvbGUtc2Vzc2lvbiIKaWYgKCEoVGVzdC1QYXRoICRyZWdwYXRoKSkgewoJTmV3LUl0ZW0gJHJlZ3BhdGggLUZvcmNlCn0KTmV3LUl0ZW1Qcm9wZXJ0eSAtUGF0aCAkcmVncGF0aCAtTmFtZSAic3RvcmFnZS1yb290IiAtVmFsdWUgIiVob21lJVxEb2N1bWVudHMiCkludm9rZS1XZWJyZXF1ZXN0IC1VcmkgImh0dHBzOi8vbGF1bmNoZXItcHVibGljLXNlcnZpY2UtcHJvZDA2Lm9sLmVwaWNnYW1lcy5jb20vbGF1bmNoZXIvYXBpL2luc3RhbGxlci9kb3dubG9hZC9FcGljR2FtZXNMYXVuY2hlckluc3RhbGxlci5tc2kiIC1PdXRmaWxlICIkSG9tZVxEZXNrdG9wXEVwaWNHYW1lc0xhdW5jaGVySW5zdGFsbGVyLm1zaSIKbXNpZXhlYy5leGUgL2kgIiRIb21lXERlc2t0b3BcRXBpY0dhbWVzTGF1bmNoZXJJbnN0YWxsZXIubXNpIiAvcXVpZXQgL25vcmVzdGFydCAvbCp2IGVwaWNnYW1lc19pbnN0YWxsX21zaS5sb2cgQUxMVVNFUlM9MQpJbnZva2UtV2VicmVxdWVzdCAtVXJpICJodHRwczovL3N0ZWFtY2RuLWEuYWthbWFpaGQubmV0L2NsaWVudC9pbnN0YWxsZXIvU3RlYW1TZXR1cC5leGUiIC1PdXRmaWxlICIkSG9tZVxEZXNrdG9wXFN0ZWFtU2V0dXAuZXhlIgomICIkSG9tZVxEZXNrdG9wXFN0ZWFtU2V0dXAuZXhlIiAvUwpJbnN0YWxsLVdpbmRvd3NGZWF0dXJlIE5ldC1GcmFtZXdvcmstQ29yZSxTZXJ2ZXItTWVkaWEtRm91bmRhdGlvbixxV2F2ZSAtUmVzdGFydAo8L3Bvd2Vyc2hlbGw+Cg==", 
+                "UserData": "PHBvd2Vyc2hlbGw+CiRQcm9ncmVzc1ByZWZlcmVuY2UgPSAnU2lsZW50bHlDb250aW51ZScKQWRkLVdpbmRvd3NDYXBhYmlsaXR5IC1PbmxpbmUgLU5hbWUgT3BlblNTSC5TZXJ2ZXJ+fn5+MC4wLjEuMApTZXQtU2VydmljZSBzc2hkIC1TdGFydHVwVHlwZSBBdXRvbWF0aWMKU3RhcnQtU2VydmljZSBzc2hkCiYgIiRFbnY6QUxMVVNFUlNQUk9GSUxFXEFtYXpvblxFQzItV2luZG93c1xMYXVuY2hcU2NyaXB0c1xJbml0aWFsaXplRGlza3MucHMxIiAtU2NoZWR1bGUKSW52b2tlLVdlYnJlcXVlc3QgLVVyaSAiaHR0cHM6Ly9kMXVqNnF0Ym1oM2R0NS5jbG91ZGZyb250Lm5ldC8yMDIwLjAvU2VydmVycy9uaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIiAtT3V0ZmlsZSAiJEhvbWVcRGVza3RvcFxuaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIgptc2lleGVjLmV4ZSAvaSAiJEhvbWVcRGVza3RvcFxuaWNlLWRjdi1zZXJ2ZXIteDY0LVJlbGVhc2UtMjAyMC4wLTg0MjgubXNpIiAvcXVpZXQgL25vcmVzdGFydCAvbCp2IGRjdl9pbnN0YWxsX21zaS5sb2cgQURETE9DQUw9YWxsCiRyZWdwYXRoID0gIlJlZ2lzdHJ5OjpIS0VZX1VTRVJTXFMtMS01LTE4XFNvZnR3YXJlXEdTZXR0aW5nc1xjb21cbmljZXNvZnR3YXJlXGRjdlxzZXNzaW9uLW1hbmFnZW1lbnRcYXV0b21hdGljLWNvbnNvbGUtc2Vzc2lvbiIKaWYgKCEoVGVzdC1QYXRoICRyZWdwYXRoKSkgewoJTmV3LUl0ZW0gJHJlZ3BhdGggLUZvcmNlCn0KTmV3LUl0ZW1Qcm9wZXJ0eSAtUGF0aCAkcmVncGF0aCAtTmFtZSAic3RvcmFnZS1yb290IiAtVmFsdWUgIiVob21lJVxEb2N1bWVudHMiCkludm9rZS1XZWJyZXF1ZXN0IC1VcmkgImh0dHBzOi8vbGF1bmNoZXItcHVibGljLXNlcnZpY2UtcHJvZDA2Lm9sLmVwaWNnYW1lcy5jb20vbGF1bmNoZXIvYXBpL2luc3RhbGxlci9kb3dubG9hZC9FcGljR2FtZXNMYXVuY2hlckluc3RhbGxlci5tc2kiIC1PdXRmaWxlICIkSG9tZVxEZXNrdG9wXEVwaWNHYW1lc0xhdW5jaGVySW5zdGFsbGVyLm1zaSIKbXNpZXhlYy5leGUgL2kgIiRIb21lXERlc2t0b3BcRXBpY0dhbWVzTGF1bmNoZXJJbnN0YWxsZXIubXNpIiAvcXVpZXQgL25vcmVzdGFydCAvbCp2IGVwaWNnYW1lc19pbnN0YWxsX21zaS5sb2cgQUxMVVNFUlM9MQpJbnZva2UtV2VicmVxdWVzdCAtVXJpICJodHRwczovL3N0ZWFtY2RuLWEuYWthbWFpaGQubmV0L2NsaWVudC9pbnN0YWxsZXIvU3RlYW1TZXR1cC5leGUiIC1PdXRmaWxlICIkSG9tZVxEZXNrdG9wXFN0ZWFtU2V0dXAuZXhlIgomICIkSG9tZVxEZXNrdG9wXFN0ZWFtU2V0dXAuZXhlIiAvUwpJbnN0YWxsLVdpbmRvd3NGZWF0dXJlIE5ldC1GcmFtZXdvcmstQ29yZSxTZXJ2ZXItTWVkaWEtRm91bmRhdGlvbixxV2F2ZSAtUmVzdGFydAo8L3Bvd2Vyc2hlbGw+Cg==", 
                 "TagSpecifications": [
-                    {
-                        "ResourceType": "spot-instances-request", 
-                        "Tags": [
-                            {
-                                "Value": "vGaming", 
-                                "Key": "Name"
-                            }
-                        ]
-                    }, 
                     {
                         "ResourceType": "instance", 
                         "Tags": [
@@ -66,7 +57,7 @@
                 ]
             }, 
             "DefaultVersion": true, 
-            "CreateTime": "2020-05-25T07:18:01.000Z"
+            "CreateTime": "2020-06-24T04:47:37.000Z"
         }
     ]
 }
