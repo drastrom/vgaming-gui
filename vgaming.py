@@ -417,15 +417,13 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         super(SettingsDlg, self).__init__(parent)
 
     def OnInit_dialog(self, evt):
-        self.decryptionTypeRadios = (self.radioOSSLFile, self.radioOSSLPKCS11, self.radioGPGSCD)
         app = wx.GetApp()
         self.ctlRegion.SetValue(app.settings.get("region", ""))
         self.ctlAccessKey.SetValue(app.settings.get("access_key_id", ""))
         self.ctlSecret.SetValue(app.settings.get("secret_access_key", ""))
         self.ctlLaunchTemplate.SetValue(app.settings.get("launch_template_id", ""))
         self.ctlKeyFileURI.SetValue(app.settings.get("decryption_key_file_uri", ""))
-        decryption_type = app.settings.get("decryption_type", 0)
-        self.decryptionTypeRadios[decryption_type if decryption_type >= 0 and decryption_type < len(self.decryptionTypeRadios) else 0].SetValue(True)
+        self.radioDecryption.SetSelection(app.settings.get("decryption_type", 0))
 
     def Save(self):
         app = wx.GetApp()
@@ -435,10 +433,7 @@ class SettingsDlg(vgaming_xrc.xrcdlgSettings):
         settings["secret_access_key"] = self.ctlSecret.GetValue()
         settings["launch_template_id"] = self.ctlLaunchTemplate.GetValue()
         settings["decryption_key_file_uri"] = self.ctlKeyFileURI.GetValue()
-        for i, radio in enumerate(self.decryptionTypeRadios):
-            if radio.GetValue():
-                settings["decryption_type"] = i
-                break
+        settings["decryption_type"] = self.radioDecryption.GetSelection()
         app.SaveSettings(settings)
 
     def OnButton_wxID_OK(self, evt):

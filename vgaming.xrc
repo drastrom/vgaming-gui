@@ -261,34 +261,18 @@
         <border>7</border>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticBoxSizer">
+        <object class="wxRadioBox" name="radioDecryption">
           <label>Password Decryption</label>
-          <orient>wxHORIZONTAL</orient>
-          <object class="sizeritem">
-            <object class="wxRadioButton" name="radioOSSLFile">
-              <label>OpenSSL &amp;File</label>
-              <style>wxRB_GROUP</style>
-              <XRCED>
-                <assign_var>1</assign_var>
-              </XRCED>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxRadioButton" name="radioOSSLPKCS11">
-              <label>OpenSSL &amp;PKCS#11</label>
-              <XRCED>
-                <assign_var>1</assign_var>
-              </XRCED>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxRadioButton" name="radioGPGSCD">
-              <label>GnuPG &amp;SCDaemon</label>
-              <XRCED>
-                <assign_var>1</assign_var>
-              </XRCED>
-            </object>
-          </object>
+          <content>
+            <item>OpenSSL &amp;File</item>
+            <item>OpenSSL &amp;PKCS#11</item>
+            <item>GnuPG &amp;SCDaemon</item>
+          </content>
+          <dimension>1</dimension>
+          <style>wxRA_SPECIFY_ROWS</style>
+          <XRCED>
+            <assign_var>1</assign_var>
+          </XRCED>
         </object>
         <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
         <border>7</border>
