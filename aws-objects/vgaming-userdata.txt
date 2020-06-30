@@ -5,15 +5,17 @@ Set-Service sshd -StartupType Automatic
 Start-Service sshd
 & "$Env:ALLUSERSPROFILE\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1" -Schedule
 Invoke-Webrequest -Uri "https://d1uj6qtbmh3dt5.cloudfront.net/2020.0/Servers/nice-dcv-server-x64-Release-2020.0-8428.msi" -Outfile "$Home\Desktop\nice-dcv-server-x64-Release-2020.0-8428.msi"
-msiexec.exe /i "$Home\Desktop\nice-dcv-server-x64-Release-2020.0-8428.msi" /quiet /norestart /l*v dcv_install_msi.log ADDLOCAL=all
+$p = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", "`"$Home\Desktop\nice-dcv-server-x64-Release-2020.0-8428.msi`"", "/quiet", "/norestart", "/l*v", "dcv_install_msi.log", "ADDLOCAL=all" -PassThru
 $regpath = "Registry::HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\session-management\automatic-console-session"
 if (!(Test-Path $regpath)) {
 	New-Item $regpath -Force
 }
 New-ItemProperty -Path $regpath -Name "storage-root" -Value "%home%\Documents"
 Invoke-Webrequest -Uri "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi" -Outfile "$Home\Desktop\EpicGamesLauncherInstaller.msi"
-msiexec.exe /i "$Home\Desktop\EpicGamesLauncherInstaller.msi" /quiet /norestart /l*v epicgames_install_msi.log ALLUSERS=1
 Invoke-Webrequest -Uri "https://steamcdn-a.akamaihd.net/client/installer/SteamSetup.exe" -Outfile "$Home\Desktop\SteamSetup.exe"
+Wait-Process -InputObject $p
+$p.Close()
+msiexec.exe /i "$Home\Desktop\EpicGamesLauncherInstaller.msi" /quiet /norestart /l*v epicgames_install_msi.log ALLUSERS=1
 & "$Home\Desktop\SteamSetup.exe" /S
 Install-WindowsFeature Net-Framework-Core,Server-Media-Foundation,qWave -Restart
 </powershell>
