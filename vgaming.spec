@@ -97,7 +97,7 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False,
+          console=DEBUG and sys.platform != "darwin",
           version=win_version,
           manifest='resources/manifest.xml',
           icon='resources/drake_molecule.ico')
