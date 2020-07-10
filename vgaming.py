@@ -50,7 +50,7 @@ class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog)
     #WHY doesn't this work without this?!?
     def OnKeyDown(self, evt):
         if evt.GetKeyCode() == wx.WXK_RETURN:
-            newevt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, self.DefaultItem.GetId())
+            newevt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, self.GetDefaultItem().GetId())
             wx.PostEvent(self, newevt)
         else:
             super(GenericMessageDialog, self).OnKeyDown(evt)
