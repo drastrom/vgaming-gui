@@ -111,7 +111,7 @@ class BaseThread(threading.Thread):
 
 
 class SingletonThread(BaseThread):
-    _singleton_instance = None
+    _singleton_instance = None # type: SingletonThread
     _lock = None # type: threading.Lock
     # this lock is shared by all SingletonThread instances
     _meta_lock = threading.Lock()
