@@ -112,7 +112,7 @@ class BaseThread(threading.Thread):
 
 class SingletonThread(BaseThread):
     _singleton_instance = None
-    _lock = None
+    _lock = None # type: threading.Lock
     # this lock is shared by all SingletonThread instances
     _meta_lock = threading.Lock()
 
@@ -131,6 +131,7 @@ class SingletonThread(BaseThread):
         self.daemon = True
 
     def is_equivalent(self, *args, **kwargs):
+        # type: (...) -> bool
         return False
 
     def raise_non_equivalence(self, *args, **kwargs):
