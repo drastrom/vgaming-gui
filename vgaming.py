@@ -219,6 +219,8 @@ class SingletonWaiterThread(ErrorDlgThread, SingletonThread):
 
 
 class DescribeInstancesThread(WaitDlgThread):
+    _no_query_states = set(("shutting-down", "terminated", "stopping", "stopped"))
+
     def __init__(self, parent):
         super(DescribeInstancesThread, self).__init__(parent)
         # make a consistent copy
@@ -239,8 +241,9 @@ class DescribeInstancesThread(WaitDlgThread):
             instance = instances[-1]
             public_ip = instance.get("PublicIpAddress", "")
             instance_id = instance["InstanceId"]
-            wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance_id, instance["SpotInstanceRequestId"], public_ip)
-            if instance["State"]["Name"] not in ("shutting-down", "terminated", "stopping", "stopped"):
+            instance_state = instance["State"]["Name"]
+            wx.CallAfter(self._update_ui, self.parent, instance_state, instance_id, instance["SpotInstanceRequestId"], public_ip)
+            if instance_state not in self._no_query_states:
                 if public_ip == "":
                     WaitForPublicIPThread.ensure_started(self.parent, self.settings, instance_id)
                 WaitForPasswordThread.ensure_started(self.parent, self.settings, instance_id)
