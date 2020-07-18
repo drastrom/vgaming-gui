@@ -267,18 +267,18 @@ class WaitForPasswordThread(SingletonWaiterThread):
         pwdata = ec2.get_password_data(InstanceId=self.instance_id)["PasswordData"]
         pwdata = base64.b64decode(pwdata)
 
-        extra_popen_args = {}
+        hide_console_win = {}
         try:
             # when running as a no-console windows app, calling a console app
             # pops up an annoying console window.  Suppress it
-            extra_popen_args['startupinfo'] = subprocess.STARTUPINFO()
-            extra_popen_args['startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            extra_popen_args['startupinfo'].wShowWindow = subprocess.SW_HIDE
+            hide_console_win['startupinfo'] = subprocess.STARTUPINFO()
+            hide_console_win['startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            hide_console_win['startupinfo'].wShowWindow = subprocess.SW_HIDE
         except (NameError, AttributeError):
             pass
 
         if self.settings["decryption_type"] == 0:
-            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **extra_popen_args)
+            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             ret = x.communicate(pwdata)
             print(ret, x.returncode)
             if x.returncode != 0:
@@ -287,14 +287,14 @@ class WaitForPasswordThread(SingletonWaiterThread):
         elif self.settings["decryption_type"] == 1:
             env = os.environ.copy()
             env["OPENSC_DRIVER"] = "openpgp"
-            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-keyform", "ENGINE", "-engine", "pkcs11", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **extra_popen_args)
+            x = subprocess.Popen(["openssl", "rsautl", "-decrypt", "-keyform", "ENGINE", "-engine", "pkcs11", "-inkey", self.settings["decryption_key_file_uri"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
             ret = x.communicate(pwdata)
             print(ret, x.returncode)
             if x.returncode != 0:
                 raise subprocess.CalledProcessError(x.returncode, "openssl", ret[1])
             password = ret[0]
         elif self.settings["decryption_type"] == 2:
-            x = subprocess.Popen(["gpg-connect-agent", 'SCD SETDATA ' + base64.b16encode(pwdata), 'SCD PKDECRYPT ' + self.settings["decryption_key_file_uri"], '/bye'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, **extra_popen_args)
+            x = subprocess.Popen(["gpg-connect-agent", 'SCD SETDATA ' + base64.b16encode(pwdata), 'SCD PKDECRYPT ' + self.settings["decryption_key_file_uri"], '/bye'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, **hide_console_win)
             ret = x.communicate()
             print(ret, x.returncode)
             if x.returncode != 0:
