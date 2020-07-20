@@ -19,12 +19,12 @@ import wx.lib.agw.genericmessagedialog
 
 # Python3 compat fallbacks
 try:
-    from urllib.parse import unquote
+    from urllib.parse import unquote # noqa
 except ImportError:
     from urllib import unquote
 
 try:
-    from typing import final
+    from typing import final # noqa
 except (ImportError, NameError):
     def final(f):
         """ This is all typing.final really is... It's all about declaring to a
@@ -40,6 +40,7 @@ _ = wx.GetTranslation
 
 # Utility function
 def make_ec2_client(settings):
+    # type: (dict) -> botocore.client.BaseClient
     return botocore.session.get_session().create_client('ec2', region_name=settings["region"], **{'aws_'+key: value for key,value in iteritems(settings) if 'access_key' in key})
 
 
@@ -49,6 +50,7 @@ class GenericMessageDialog(wx.lib.agw.genericmessagedialog.GenericMessageDialog)
 
     #WHY doesn't this work without this?!?
     def OnKeyDown(self, evt):
+        # type: (wx.KeyEvent) -> None
         if evt.GetKeyCode() == wx.WXK_RETURN:
             newevt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, self.GetDefaultItem().GetId())
             wx.PostEvent(self, newevt)
@@ -163,7 +165,7 @@ class SingletonThread(BaseThread):
 class ErrorDlgThread(BaseThread):
     def __init__(self, parent, **kwargs):
         super(ErrorDlgThread, self).__init__(**kwargs)
-        self.parent = parent
+        self.parent = parent # type: MainFrame
 
     def on_success(self):
         del self.parent
@@ -206,8 +208,8 @@ class WaitDlgThread(ErrorDlgThread):
 class SingletonWaiterThread(ErrorDlgThread, SingletonThread):
     def __init__(self, parent, settings, instance_id):
         super(SingletonWaiterThread, self).__init__(parent)
-        self.settings = settings
-        self.instance_id = instance_id
+        self.settings = settings # type: dict
+        self.instance_id = instance_id # type: str
 
     def is_equivalent(self, parent, settings, instance_id):
         return self.instance_id == instance_id
@@ -224,7 +226,7 @@ class DescribeInstancesThread(WaitDlgThread):
     def __init__(self, parent):
         super(DescribeInstancesThread, self).__init__(parent)
         # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings) # type: dict
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -249,6 +251,7 @@ class DescribeInstancesThread(WaitDlgThread):
                 WaitForPasswordThread.ensure_started(self.parent, self.settings, instance_id)
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id, public_ip):
+        # type: (MainFrame, str, str, str, str) -> None
         parent.ctlStatus.SetValue(state)
         parent.ctlInstanceId.SetValue(instance_id)
         parent.ctlSpotId.SetValue(spot_instance_request_id)
@@ -321,6 +324,7 @@ class WaitForPublicIPThread(SingletonWaiterThread):
         wx.CallAfter(self._update_ui, self.parent, instance["State"]["Name"], instance["PublicIpAddress"])
 
     def _update_ui(self, parent, state, public_ip):
+        # type: (MainFrame, str, str) -> None
         parent.ctlStatus.SetValue(state)
         parent.ctlPublicIP.SetValue(public_ip)
 
@@ -344,7 +348,7 @@ class StartInstanceThread(WaitDlgThread):
         super(StartInstanceThread, self).__init__(parent)
         self.subnet_id = subnet_id
         # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings) # type: dict
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -356,6 +360,7 @@ class StartInstanceThread(WaitDlgThread):
         WaitForPasswordThread.ensure_started(self.parent, self.settings, instance_id)
 
     def _update_ui(self, parent, state, instance_id, spot_instance_request_id):
+        # type: (MainFrame, str, str, str) -> None
         parent.ctlStatus.SetValue(state)
         parent.ctlInstanceId.SetValue(instance_id)
         parent.ctlSpotId.SetValue(spot_instance_request_id)
@@ -367,7 +372,7 @@ class TerminateInstanceThread(WaitDlgThread):
         self.instance_id = instance_id
         self.spot_instance_request_id = spot_instance_request_id
         # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings) # type: dict
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -384,7 +389,7 @@ class DescribeSubnetsThread(WaitDlgThread):
     def __init__(self, parent):
         super(DescribeSubnetsThread, self).__init__(parent)
         # make a consistent copy
-        self.settings = deepcopy(wx.GetApp().settings)
+        self.settings = deepcopy(wx.GetApp().settings) # type: dict
 
     def process(self):
         ec2 = make_ec2_client(self.settings)
@@ -404,7 +409,8 @@ class PickSubnetDlg(vgaming_xrc.xrcdlgSubnetPicker):
             self.choiceSubnet.Append(subnet_name, subnet_id)
 
     def OnChoice_choiceSubnet(self, evt):
-        self.wxID_OK.Enable(evt.Selection != wx.NOT_FOUND)
+        # type: (wx.CommandEvent) -> None
+        self.wxID_OK.Enable(evt.GetSelection() != wx.NOT_FOUND)
 
     def OnButton_wxID_OK(self, evt):
         selection = self.choiceSubnet.GetSelection()
@@ -535,7 +541,7 @@ class VGamingApp(wx.App):
         self.SetAppName('vGaming')
         try:
             with open("config.json", "r") as fp:
-                self.settings = json.load(fp)
+                self.settings = json.load(fp) # type: dict
         except:
             self.settings = {}
         self.mainframe = MainFrame(None)
