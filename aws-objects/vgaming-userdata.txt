@@ -4,8 +4,8 @@ Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 Set-Service sshd -StartupType Automatic
 Start-Service sshd
 & "$Env:ALLUSERSPROFILE\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1" -Schedule
-Invoke-Webrequest -Uri "https://d1uj6qtbmh3dt5.cloudfront.net/2020.0/Servers/nice-dcv-server-x64-Release-2020.0-8428.msi" -Outfile "$Home\Desktop\nice-dcv-server-x64-Release-2020.0-8428.msi"
-$p = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", "`"$Home\Desktop\nice-dcv-server-x64-Release-2020.0-8428.msi`"", "/quiet", "/norestart", "/l*v", "dcv_install_msi.log", "ADDLOCAL=all" -PassThru
+Invoke-Webrequest -Uri "https://d1uj6qtbmh3dt5.cloudfront.net/2020.1/Servers/nice-dcv-server-x64-Release-2020.1-8942.msi" -Outfile "$Home\Desktop\nice-dcv-server-x64-Release-2020.1-8942.msi"
+$p = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", "`"$Home\Desktop\nice-dcv-server-x64-Release-2020.1-8942.msi`"", "/quiet", "/norestart", "/l*v", "dcv_install_msi.log", "ADDLOCAL=all" -PassThru
 $regpath = "Registry::HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\session-management\automatic-console-session"
 if (!(Test-Path $regpath)) {
 	New-Item $regpath -Force
