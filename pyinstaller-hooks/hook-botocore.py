@@ -22,7 +22,12 @@
 
 import os.path
 from PyInstaller.utils.hooks import get_package_paths
-from PyInstaller.compat import is_py2
+try:
+    from PyInstaller.compat import is_py2
+except ImportError:
+    import sys
+    is_py2 = sys.version[0] == 2
+
 from PyInstaller.utils.hooks import is_module_satisfies
 
 if is_module_satisfies('botocore >= 1.4.36'):
